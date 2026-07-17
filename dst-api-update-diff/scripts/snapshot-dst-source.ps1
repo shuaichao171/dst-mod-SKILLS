@@ -18,6 +18,19 @@ function Get-CaptureValues {
     )
 }
 
+function Get-FunctionNames {
+    param(
+        [string]$Text
+    )
+
+    @(
+        Get-CaptureValues $Text '(?m)^\s*(?:local\s+)?function\s+([A-Za-z_][A-Za-z0-9_:.]*)'
+        Get-CaptureValues $Text '(?m)^\s*(?:local\s+)?([A-Za-z_][A-Za-z0-9_:.]*)\s*=\s*function\s*\('
+    ) |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Sort-Object -Unique
+}
+
 $resolvedRoot = (Resolve-Path -LiteralPath $Root -ErrorAction Stop).Path
 if (-not (Test-Path -LiteralPath (Join-Path $resolvedRoot 'main.lua') -PathType Leaf)) {
     throw ('The root does not look like a DST data/scripts directory: ' + $resolvedRoot)
@@ -33,7 +46,7 @@ $records = @(
             [ordered]@{
                 path = $relative
                 sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-                functions = @(Get-CaptureValues $content '(?m)^\s*(?:local\s+)?function\s+([A-Za-z_][A-Za-z0-9_:.]*)')
+                functions = @(Get-FunctionNames $content)
                 requires = @(Get-CaptureValues $content 'require\s*\(?\s*[''\x22]([^''\x22]+)[''\x22]')
                 prefabs = @(Get-CaptureValues $content 'Prefab\s*\(\s*[''\x22]([^''\x22]+)[''\x22]')
                 components = @(Get-CaptureValues $content 'AddComponent\s*\(\s*[''\x22]([^''\x22]+)[''\x22]')
@@ -65,4 +78,3 @@ $encoding = New-Object System.Text.UTF8Encoding($false)
     OutputPath = $fullOutput
     FileCount = $records.Count
 }
-
