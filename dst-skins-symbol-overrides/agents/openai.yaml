@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Skins Symbol Overrides"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-skins-symbol-overrides to implement and verify this DST mod task."

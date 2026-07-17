@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Events Tasks Lifecycle"
+  short_description: "DST events tasks lifecycle implementation and verification"
+  default_prompt: "Use $dst-events-tasks-lifecycle to implement and verify this DST mod task."

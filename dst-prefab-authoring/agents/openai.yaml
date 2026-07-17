@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Prefab Authoring"
+  short_description: "DST prefab authoring implementation and verification"
+  default_prompt: "Use $dst-prefab-authoring to implement and verify this DST mod task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Action Authoring"
+  short_description: "DST action authoring implementation and verification"
+  default_prompt: "Use $dst-action-authoring to implement and verify this DST mod task."

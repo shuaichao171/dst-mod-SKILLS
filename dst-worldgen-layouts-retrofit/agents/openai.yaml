@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Worldgen Layouts Retrofit"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-worldgen-layouts-retrofit to implement and verify this DST mod task."

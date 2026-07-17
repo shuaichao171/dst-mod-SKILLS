@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Worldgen Authoring"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-worldgen-authoring to implement and verify this DST mod task."

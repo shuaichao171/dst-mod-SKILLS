@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Shader Authoring"
+  short_description: "Create and integrate DST mod shaders"
+  default_prompt: "Use $dst-shader-authoring to create and integrate a parameterized DST mod shader."

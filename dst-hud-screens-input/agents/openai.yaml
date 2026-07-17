@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Hud Screens Input"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-hud-screens-input to implement and verify this DST mod task."

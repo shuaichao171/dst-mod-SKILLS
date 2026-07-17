@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Plants Farming Regrowth"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-plants-farming-regrowth to implement and verify this DST mod task."

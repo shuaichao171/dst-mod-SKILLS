@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Mod Scaffolding"
+  short_description: "DST mod scaffolding implementation and verification"
+  default_prompt: "Use $dst-mod-scaffolding to implement and verify this DST mod task."

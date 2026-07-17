@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Persistence Migration"
+  short_description: "DST persistence migration implementation and verification"
+  default_prompt: "Use $dst-persistence-migration to implement and verify this DST mod task."

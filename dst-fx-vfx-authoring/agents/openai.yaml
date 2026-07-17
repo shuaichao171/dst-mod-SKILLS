@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Fx Vfx Authoring"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-fx-vfx-authoring to implement and verify this DST mod task."

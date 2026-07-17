@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Crafting Tech Prototypers"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-crafting-tech-prototypers to implement and verify this DST mod task."

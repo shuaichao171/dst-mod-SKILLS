@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Client Frontend Mods"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-client-frontend-mods to implement and verify this DST mod task."

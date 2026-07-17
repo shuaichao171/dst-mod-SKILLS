@@ -1,0 +1,4 @@
+interface:
+  display_name: "DST Tiles Map Minimap"
+  short_description: "Build and verify DST mod systems safely"
+  default_prompt: "Use $dst-tiles-map-minimap to implement and verify this DST mod task."
