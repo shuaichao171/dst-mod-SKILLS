@@ -12,7 +12,7 @@ description: Create and maintain playable Don't Starve Together characters. Use 
 1. 定义角色规格：基础属性、优势、弱点、初始物品、专属动作、制作、技能树、语音、资源和存档状态。
 2. 对照 prefabs/player_common.lua 与至少一个机制相近的原版角色，使用玩家构造助手创建 Prefab。
 3. 在所有端初始化 AnimState、标签、网络变量、地图图标和客户端表现；在主机初始化组件数值、物品、监听和保存状态。
-4. 通过 AddModCharacter 注册角色，并补齐 STRINGS.CHARACTER_NAMES[name]、STRINGS.CHARACTER_DESCRIPTIONS[name]、STRINGS.CHARACTER_QUOTES[name] 与角色 speech 文件；只有实际提供皮肤时才添加相应 STRINGS.SKIN_NAMES 键。
+4. 只调用一次 AddModCharacter(name, gender, modes) 注册角色；显式传入 FEMALE、MALE、ROBOT、NEUTRAL 或 PLURAL 之一，避免 nil 的警告和默认 NEUTRAL。补齐 STRINGS.CHARACTER_NAMES[name]、STRINGS.CHARACTER_DESCRIPTIONS[name]、STRINGS.CHARACTER_QUOTES[name] 与角色 speech 文件；只有实际提供皮肤时才添加相应 STRINGS.SKIN_NAMES 键。
 5. 优先向 SGwilson 和客户端 SG 添加状态、事件或 ActionHandler，不复制整份玩家 SG。
 6. 专属制作使用角色过滤器、builder_tag 或 builder_skill；技能树按 skilltree Skill 的数据和同步流程接入。
 7. 测试新建角色、重选角色、死亡复活、换洞穴、断线重连、保存重载、不同客户端资源和手柄 UI。

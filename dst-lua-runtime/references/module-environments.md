@@ -14,6 +14,7 @@ mods.lua 为模组入口显式设置环境，并让 modimport 对目标块再次
 
 - 在 require 模块中直接使用 Class、TheWorld、net_bool、State、FRAMES 等游戏全局，并用 require 加载依赖。不要假设 GLOBAL 存在。
 - 在模组入口和 modimport 注册文件中直接调用该环境注入的 Add、Register、PostInit 等 API；访问未注入的游戏全局时使用 GLOBAL。
+- 入口或 modimport 文件中的 GetModConfigData(optionname, get_local_config) 会自动绑定当前 env.modname。require 模块调用全局 GetModConfigData 时必须传入 modname；更稳妥的做法是在 modmain.lua 读取配置后把纯值传给模块。
 - 让 require 模块显式 return 类、表或函数。某些原版 behaviour 文件只注册全局类而不返回值；先单独 require，再使用其全局名。
 - 在 modmain.lua 尽早执行 AddReplicableComponent、动作和 SG 钩子等注册，避免相关实体或模块先被实例化。
 

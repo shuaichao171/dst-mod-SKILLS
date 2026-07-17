@@ -10,12 +10,13 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 ## 工作流
 
 1. 确定需求是地面 Tile、可铺 Turf、地图图标、Minimap Tile 还是 MapExplorer/MapReveal 行为。
-2. 为自定义 Tile 注册独立范围，再用 AddTile 提供 tile_data、ground_tile_def、minimap_tile_def 和 turf_def。
-3. 声明 ground、noise、minimap、inventory atlas 等资源，并核对纹理尺寸、格式和路径。
-4. 按需要设置 Tile、Minimap 和 Falloff 属性或渲染顺序；只调整自定义内容相关项。
-5. 世界生成 Room 与布局引用稳定 Tile 常量，不硬编码可能冲突的数字 ID。
-6. 实体地图图标使用 MiniMapEntity 和注册 Atlas，明确可见范围、图标和移除行为。
-7. 用新世界、存档重载、铺地/铲地、地图缩放和多个地皮模组组合测试。
+2. 为自定义 Tile 注册唯一范围；RegisterTileRange 要求 range_end - range_start 至少为 256，再用 AddTile 提供 tile_data、ground_tile_def、minimap_tile_def 和 turf_def。
+3. 若 Tile 会被 Room、Task 或 Layout 使用，把相同注册代码放入 modworldgenmain.lua 与 modmain.lua：世界生成只加载前者，不会执行后者。
+4. 声明 ground、noise、minimap、inventory atlas 等资源，并核对纹理尺寸、格式和路径。
+5. 按需要设置 Tile、Minimap 和 Falloff 属性或渲染顺序；只调整自定义内容相关项。
+6. 世界生成 Room 与布局引用稳定 Tile 常量，不硬编码可能冲突的数字 ID。
+7. 实体地图图标使用 MiniMapEntity 和注册 Atlas，明确可见范围、图标和移除行为。
+8. 用新世界、存档重载、铺地/铲地、地图缩放和多个地皮模组组合测试。
 
 ## 源码锚点
 
@@ -27,6 +28,7 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 ## 不变量
 
 - 不要硬编码占用原版或其他模组的 Tile ID。
+- Tile range 名称必须唯一，且 range_end - range_start 不得小于 256。
 - 世界 Tile、Minimap Tile 与 Turf 定义缺一时要明确限制。
 - 客户端资源路径必须与 Asset 声明完全一致。
 - 改变渲染顺序前检查对其他地皮的全局影响。
