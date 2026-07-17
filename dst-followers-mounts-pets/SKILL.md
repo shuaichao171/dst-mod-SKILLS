@@ -13,7 +13,7 @@ description: Create Don't Starve Together followers, leaders, pets, mounts, dome
 2. 使用 leader/follower 建立关系；客户端需要显示时通过 follower_replica 或最小网络字段读取。
 3. Brain 处理跟随、距离、战斗和回家意图；SG 处理召回、攻击、骑乘与不可中断动画。
 4. 坐骑使用 rideable、rider、domesticatable 等现有契约，分别处理上马、下马、被打断和装备。
-5. 把长期忠诚、驯化和关联实体引用保存，并在 LoadPostPass 或迁移事件恢复。
+5. 把长期忠诚、驯化和关联实体引用保存，并在 Component:LoadPostPass、Prefab OnLoadPostPass 或迁移事件中恢复。
 6. 拥有者移除时根据设计选择等待、传送、解除、保存或销毁，避免孤儿实体。
 7. 测试多个玩家争抢、断线重连、死亡复活、洞穴迁移、远距离和坐骑上的自定义动作。
 
@@ -36,4 +36,3 @@ description: Create Don't Starve Together followers, leaders, pets, mounts, dome
 - 关系建立、切换和解除不会留下双方残余引用。
 - 保存重载、断线和换洞穴后按设计恢复。
 - 骑乘中的动作、受击、死亡和强制下马都能回到合法状态。
-

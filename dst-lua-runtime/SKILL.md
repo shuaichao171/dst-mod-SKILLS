@@ -11,7 +11,7 @@ description: Work safely with the Don't Starve Together Lua runtime and mod envi
 
 1. 识别代码运行于 modinfo、前端、世界生成、服务器、客户端还是分片上下文。
 2. 沿 class.lua、metaclass.lua 和目标类的 Class 构造追踪继承与方法查找。
-3. 优先使用局部变量；在模组入口或 modimport 文件中用入口注入的 API，并在确需访问 _G 时使用 GLOBAL；在 require 加载的 Prefab、Component、Replica、Brain、SG 和 Widget 模块中直接使用游戏全局。
+3. 优先使用局部变量；在模组入口或 modimport 文件中用入口注入的 API，并通过 GLOBAL 访问未注入的引擎对象或 Lua 标准函数；在 require 加载的 Prefab、Component、Replica、Brain、SG 和 Widget 模块中直接使用游戏全局。
 4. 用 require 加载有返回值且需要 package.loaded 缓存的模块；只用 modimport 执行需要模组环境 API 的注册文件。不要依赖 modimport 的返回值或缓存。
 5. 修改闭包或 upvalue 前先证明公开钩子不足，并准备版本变化后的失败检测。
 6. 创建任务、线程或回调时记录所有者，并在实体移除、Widget 销毁或状态退出时取消。

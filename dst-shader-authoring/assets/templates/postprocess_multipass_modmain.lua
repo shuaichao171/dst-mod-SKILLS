@@ -1,6 +1,20 @@
 local BLUR_H_SHADER = "shaders/my_blur_h.ksh"
 local BLUR_V_SHADER = "shaders/my_blur_v.ksh"
 local COMPOSITE_SHADER = "shaders/my_blur_composite.ksh"
+-- modmain.lua has a restricted environment. Localize stable globals explicitly,
+-- but fetch PostProcessor only after the engine creates it.
+local assert = GLOBAL.assert
+local tonumber = GLOBAL.tonumber
+local hash = GLOBAL.hash
+local PostProcessorEffects = GLOBAL.PostProcessorEffects
+local resolvefilepath = GLOBAL.resolvefilepath
+local WRAP_MODE = GLOBAL.WRAP_MODE
+local FILTER_MODE = GLOBAL.FILTER_MODE
+local MIP_FILTER_MODE = GLOBAL.MIP_FILTER_MODE
+local SamplerSizes = GLOBAL.SamplerSizes
+local SamplerColourMode = GLOBAL.SamplerColourMode
+local SamplerEffectBase = GLOBAL.SamplerEffectBase
+
 local DEFAULT_BLUR_STRENGTH = 0.5
 local MultiPass = {}
 
@@ -10,12 +24,14 @@ table.insert(Assets, Asset("SHADER", BLUR_V_SHADER))
 table.insert(Assets, Asset("SHADER", COMPOSITE_SHADER))
 
 function SetMyPostProcessBlurStrength(value)
+    local PostProcessor = GLOBAL.PostProcessor
     assert(MultiPass.strength ~= nil, "multipass shader is not initialized")
     value = math.max(0, math.min(1, tonumber(value) or 0))
     PostProcessor:SetUniformVariable(MultiPass.strength, value)
 end
 
 local function ConfigureSamplerEffect(effect)
+    local PostProcessor = GLOBAL.PostProcessor
     PostProcessor:SetSamplerEffectState(effect, WRAP_MODE.CLAMP_TO_EDGE)
     PostProcessor:SetSamplerEffectFilter(
         effect,
@@ -26,6 +42,7 @@ local function ConfigureSamplerEffect(effect)
 end
 
 AddModShadersInit(function()
+    local PostProcessor = GLOBAL.PostProcessor
     local sampler_params = hash("SAMPLER_PARAMS")
 
     MultiPass.strength = PostProcessor:AddUniformVariable("MY_BLUR_STRENGTH", 1)
@@ -66,6 +83,7 @@ AddModShadersInit(function()
 end)
 
 AddModShadersSortAndEnable(function()
+    local PostProcessor = GLOBAL.PostProcessor
     assert(PostProcessor:SetPostProcessEffectAfter(
         MultiPass.composite,
         PostProcessorEffects.ColourCube

@@ -32,7 +32,7 @@ Entity:AddAnimState、AddPhysics、AddLight、AddFollower、AddVFXEffect 等可�
 检查以下路径是否需要处理：
 
 - OnEntitySleep 与 OnEntityWake
-- OnSave、OnLoad、LoadPostPass、LongUpdate
+- inst.OnSave、inst.OnLoad、inst.OnLoadPostPass、inst.OnLongUpdate
 - OnRemoveEntity
 - 进入和离开库存
 - 装备和卸下

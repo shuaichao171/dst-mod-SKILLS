@@ -14,7 +14,7 @@ description: Create and modify Don't Starve Together prefab entities. Use when w
 3. 在 SetPristine 前完成客户端必须立即看到的标签、AnimState 初值、直接挂在实体上的网络变量和原生 Entity 子系统。
 4. 调用 inst.entity:SetPristine()，随后在 not TheWorld.ismastersim 分支立即返回客户端实例。
 5. 仅在主机分支添加普通 Component、Brain、服务器 SG、掉落、计时、保存和权威事件逻辑。
-6. 为 OnSave、OnLoad、LoadPostPass、OnRemoveEntity、OnEntitySleep 和 OnEntityWake 明确生命周期责任。
+6. 为 inst.OnSave、inst.OnLoad、inst.OnLoadPostPass、inst.OnLongUpdate、inst.OnRemoveEntity、inst.OnEntitySleep 和 inst.OnEntityWake 明确生命周期责任；不要把 Component 的 LoadPostPass 或 LongUpdate 方法名直接用作 Prefab 回调字段。
 7. 返回 Prefab；需要放置时同时创建 Placer，并在 modmain.lua 注册 PrefabFiles 与 Assets。
 
 ## 源码锚点

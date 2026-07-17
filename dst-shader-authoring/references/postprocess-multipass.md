@@ -1,6 +1,34 @@
 # DST PostProcessor Multipass
 
+## 目录
+
+- [API 形状](#api-形状)
+- [尺寸与颜色](#尺寸与颜色)
+- [自动 SAMPLER_PARAMS](#自动-sampler_params)
+- [采样状态与过滤](#采样状态与过滤)
+- [构建 pass 链](#构建-pass-链)
+- [编译模板](#编译模板)
+- [调试顺序](#调试顺序)
+
 ## API 形状
+
+以下代码运行在 `modmain.lua` 时，先从 `GLOBAL` 局部化入口阶段已经存在的未注入对象；完整模板已经包含这些声明：
+
+```lua
+local assert = GLOBAL.assert
+local tonumber = GLOBAL.tonumber
+local hash = GLOBAL.hash
+local PostProcessorEffects = GLOBAL.PostProcessorEffects
+local resolvefilepath = GLOBAL.resolvefilepath
+local WRAP_MODE = GLOBAL.WRAP_MODE
+local FILTER_MODE = GLOBAL.FILTER_MODE
+local MIP_FILTER_MODE = GLOBAL.MIP_FILTER_MODE
+local SamplerSizes = GLOBAL.SamplerSizes
+local SamplerColourMode = GLOBAL.SamplerColourMode
+local SamplerEffectBase = GLOBAL.SamplerEffectBase
+```
+
+`PostProcessor` 本身晚于 `modmain.lua` 创建，不能在文件加载时缓存。应在 `AddModShadersInit`、`AddModShadersSortAndEnable` 回调及它们调用的辅助函数内使用 `local PostProcessor = GLOBAL.PostProcessor`。
 
 本地 `scripts/postprocesseffects.lua` 展示了三类对象：
 

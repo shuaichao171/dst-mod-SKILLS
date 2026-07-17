@@ -1,5 +1,17 @@
 # DST Shader Contracts
 
+## 目录
+
+- [本地权威参考](#本地权威参考)
+- [GLSL 兼容层](#glsl-兼容层)
+- [世界 AnimState Bloom Pass](#世界-animstate-bloom-pass)
+- [UIAnim AnimState 契约](#uianim-animstate-契约)
+- [UI Image 契约](#ui-image-契约)
+- [VFXEffect 契约](#vfxeffect-契约)
+- [PostProcessor 契约](#postprocessor-契约)
+- [编译与问题定位](#编译与问题定位)
+- [性能](#性能)
+
 ## 本地权威参考
 
 在同一份 DST 安装中优先读取下列文件，而不是凭记忆补全引擎接口：
@@ -188,6 +200,26 @@ effect:SetScaleEnvelope(0, "my_scale_envelope")
 需要世界光照时参考 `vfx_particle.ksh`，并保留 `MatrixW`、世界位置、`LIGHTMAP_WORLD_EXTENTS` 与对应 lightmap sampler。
 
 ## PostProcessor 契约
+
+后处理注册通常写在 `modmain.lua`。该入口只注入有限的 Lua 函数和模组 API；先显式局部化没有注入的对象：
+
+```lua
+local assert = GLOBAL.assert
+local tonumber = GLOBAL.tonumber
+local PostProcessorEffects = GLOBAL.PostProcessorEffects
+local resolvefilepath = GLOBAL.resolvefilepath
+```
+
+`modmain.lua` 执行时 `GLOBAL.PostProcessor` 仍为 nil；引擎稍后创建它，再调用模组 Shader 回调。因此要在回调或实际调用的辅助函数内读取：
+
+```lua
+AddModShadersInit(function()
+    local PostProcessor = GLOBAL.PostProcessor
+    -- Create uniforms and effects here.
+end)
+```
+
+多 pass 还需要从 `GLOBAL` 局部化 `hash`、`WRAP_MODE`、`FILTER_MODE`、`MIP_FILTER_MODE`、`SamplerSizes`、`SamplerColourMode` 和 `SamplerEffectBase`。不要在 `modmain.lua` 中直接假设这些名称已注入。
 
 基础全屏顶点阶段：
 

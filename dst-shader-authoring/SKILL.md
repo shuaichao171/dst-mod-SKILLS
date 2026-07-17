@@ -42,7 +42,9 @@ description: Create, compile, debug, and integrate shader resources for Don't St
 - 不要把 `vfx_particle_add` 的预乘契约套到 `vfx_particle_reveal`；先确认目标 blend/shader 家族。
 - 仅为实际有来源的 uniform 声明变量。普通后处理 uniform 必须依次 `AddUniformVariable`、`SetEffectUniformVariables`、`SetUniformVariable`。
 - 把 sampler effect 的自动 `SAMPLER_PARAMS` 作为特殊内建 uniform 处理，不要手动写入它。
-- 使用 `resolvefilepath()` 传递 Mod 自己的运行时 shader 与纹理路径；`Asset` 注册仍使用 Mod 相对路径。
+- 后处理注册文件运行在 `modmain.lua` 的受限环境；`Asset`、`AddModShadersInit` 与 `AddModShadersSortAndEnable` 会被注入，`resolvefilepath`、`hash`、后处理枚举及未注入的标准函数必须从 `GLOBAL` 局部化。
+- `PostProcessor` 晚于 `modmain.lua` 创建；在 `AddModShadersInit`、`AddModShadersSortAndEnable` 回调或实际调用的辅助函数内读取 `GLOBAL.PostProcessor`，不要在入口加载时缓存 nil。附带模板已处理该时序。
+- 使用从 `GLOBAL` 局部化的 `resolvefilepath()` 传递 Mod 自己的运行时 shader 与纹理路径；`Asset` 注册仍使用 Mod 相对路径。
 
 ## 编译与部署
 

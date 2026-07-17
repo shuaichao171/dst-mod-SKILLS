@@ -11,7 +11,7 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 
 1. 确定需求是地面 Tile、可铺 Turf、地图图标、Minimap Tile 还是 MapExplorer/MapReveal 行为。
 2. 为自定义 Tile 注册唯一范围；RegisterTileRange 要求 range_end - range_start 至少为 256，再用 AddTile 提供 tile_data、ground_tile_def、minimap_tile_def 和 turf_def。
-3. 若 Tile 会被 Room、Task 或 Layout 使用，把相同注册代码放入 modworldgenmain.lua 与 modmain.lua：世界生成只加载前者，不会执行后者。
+3. 把自定义 Tile 的 RegisterTileRange 与 AddTile 注册放入 modworldgenmain.lua。mods.lua 在普通运行时会先加载该入口再加载 modmain.lua，而世界生成会跳过 modmain.lua；不要在两个入口无条件重复注册，否则普通运行时会触发重复 range 或 Tile 断言。
 4. 声明 ground、noise、minimap、inventory atlas 等资源，并核对纹理尺寸、格式和路径。
 5. 按需要设置 Tile、Minimap 和 Falloff 属性或渲染顺序；只调整自定义内容相关项。
 6. 世界生成 Room 与布局引用稳定 Tile 常量，不硬编码可能冲突的数字 ID。

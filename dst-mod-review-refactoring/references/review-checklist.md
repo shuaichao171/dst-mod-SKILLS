@@ -15,7 +15,7 @@
 4. Component、Replica、netvar 与 RPC 校验。
 5. Action、SG 与 Brain 职责。
 6. 事件、任务、睡眠和清理。
-7. OnSave、OnLoad、LoadPostPass 与 LongUpdate。
+7. Component 的 OnSave、OnLoad、LoadPostPass、LongUpdate，以及 Prefab 的 OnSave、OnLoad、OnLoadPostPass、OnLongUpdate。
 8. FindEntities、OnUpdate、网络和 FX 性能。
 9. UI 焦点、输入和 Kill。
 10. 资源路径、动画、Atlas 和字符串。
@@ -31,4 +31,3 @@
 - 当前源码证据
 - 修复方向
 - 需要的验证
-
