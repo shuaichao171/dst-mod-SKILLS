@@ -26,8 +26,8 @@
 
 示例：
 
-    powershell -File scripts/scan-dst-source.ps1 -Mode Summary
-    powershell -File scripts/scan-dst-source.ps1 -Mode Symbol -Pattern AddBrainPostInit
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/scan-dst-source.ps1 -Mode Summary
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/scan-dst-source.ps1 -Mode Symbol -Pattern AddBrainPostInit
     rg -n SetPristine <source-root>/prefabs -g *.lua
 
 ## 引擎原生边界
@@ -51,4 +51,3 @@ Entity:AddTransform、AnimState、Physics、TheSim 等接口可能由引擎绑�
 - 推断及其证据
 - 风险和未解决项
 - 推荐原版范例
-

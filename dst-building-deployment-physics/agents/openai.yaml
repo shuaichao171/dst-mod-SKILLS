@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Building Deployment Physics"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-building-deployment-physics to implement and verify this DST mod task."
+  display_name: 'DST Building Deployment Physics'
+  short_description: 'Build deployable DST structures and physics'
+  default_prompt: 'Use $dst-building-deployment-physics to implement and verify this DST mod task.'

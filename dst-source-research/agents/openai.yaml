@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Source Research"
-  short_description: "DST source research implementation and verification"
-  default_prompt: "Use $dst-source-research to implement and verify this DST mod task."
+  display_name: 'DST Source Research'
+  short_description: 'Trace installed DST Lua source and vanilla patterns'
+  default_prompt: 'Use $dst-source-research to implement and verify this DST mod task.'

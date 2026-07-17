@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Scenarios Setpieces Cutscenes"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-scenarios-setpieces-cutscenes to implement and verify this DST mod task."
+  display_name: 'DST Scenarios Setpieces Cutscenes'
+  short_description: 'Build persistent DST scenarios and cutscenes'
+  default_prompt: 'Use $dst-scenarios-setpieces-cutscenes to implement and verify this DST mod task.'

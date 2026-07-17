@@ -1,3 +1,5 @@
+-- This is a registration file. Load it from modmain.lua with modimport,
+-- because AddAction and AddComponentAction belong to the mod environment.
 local ActionHandler = GLOBAL.ActionHandler
 
 local MOD_INTERACT = AddAction(
@@ -33,6 +35,3 @@ AddComponentAction(
 
 AddStategraphActionHandler('wilson', ActionHandler(MOD_INTERACT, 'doshortaction'))
 AddStategraphActionHandler('wilson_client', ActionHandler(MOD_INTERACT, 'doshortaction'))
-
-return MOD_INTERACT
-

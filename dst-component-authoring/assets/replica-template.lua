@@ -1,7 +1,3 @@
-local Class = GLOBAL.Class
-local TheWorld = GLOBAL.TheWorld
-local net_bool = GLOBAL.net_bool
-
 local ModState = Class(function(self, inst)
     self.inst = inst
     self._enabled = net_bool(inst.GUID, 'mod_state.enabled', 'mod_state_dirty')
@@ -18,4 +14,3 @@ function ModState:IsEnabled()
 end
 
 return ModState
-

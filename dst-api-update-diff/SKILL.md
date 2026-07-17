@@ -10,7 +10,7 @@ description: Compare Don't Starve Together Lua source across game updates and as
 ## 工作流
 
 1. 确定旧版与新版 data/scripts 根目录，或使用此前由脚本生成的快照；记录游戏构建与日期。
-2. 运行 scripts/snapshot-dst-source.ps1 生成文件哈希、Lua 函数、Prefab、组件、Brain、SG 和关键 API 索引。
+2. 运行 scripts/snapshot-dst-source.ps1 生成文件哈希、Lua 函数、Prefab、组件、Brain、SG 和关键 API 索引，再用 scripts/compare-dst-snapshots.ps1 生成文件级变化表。
 3. 比较新增、删除、重命名和内容变化，先检查 modutil.lua、entityscript.lua、networkclientrpc.lua 等公共边界。
 4. 针对目标模组搜索其使用的函数、字段、组件、事件、标签和原版 Prefab，建立受影响清单。
 5. 对内容变化文件做语义检查：参数、返回值、主客机分支、保存结构、状态名和调用顺序。
@@ -40,5 +40,5 @@ description: Compare Don't Starve Together Lua source across game updates and as
 ## 按需资源
 
 - 运行 scripts/snapshot-dst-source.ps1 生成可比较快照。
+- 运行 scripts/compare-dst-snapshots.ps1 比较两个快照。
 - 需要影响分级时读取 references/update-assessment.md。
-

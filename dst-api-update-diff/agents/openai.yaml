@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Api Update Diff"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-api-update-diff to implement and verify this DST mod task."
+  display_name: 'DST API Update Diff'
+  short_description: 'Compare DST source updates and assess compatibility'
+  default_prompt: 'Use $dst-api-update-diff to implement and verify this DST mod task.'

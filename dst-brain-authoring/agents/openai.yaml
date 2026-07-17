@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Brain Authoring"
-  short_description: "DST brain authoring implementation and verification"
-  default_prompt: "Use $dst-brain-authoring to implement and verify this DST mod task."
+  display_name: 'DST Brain Authoring'
+  short_description: 'Build efficient DST brains and behavior trees'
+  default_prompt: 'Use $dst-brain-authoring to implement and verify this DST mod task.'

@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Followers Mounts Pets"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-followers-mounts-pets to implement and verify this DST mod task."
+  display_name: 'DST Followers Mounts Pets'
+  short_description: 'Build DST followers pets mounts and ownership'
+  default_prompt: 'Use $dst-followers-mounts-pets to implement and verify this DST mod task.'

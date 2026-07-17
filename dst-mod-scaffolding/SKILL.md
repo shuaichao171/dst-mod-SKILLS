@@ -1,6 +1,6 @@
 ---
 name: dst-mod-scaffolding
-description: Create and organize Don't Starve Together mod skeletons. Use when starting a mod, writing modinfo.lua, modmain.lua, modworldgenmain.lua, or modfrontendmain.lua, defining configuration options and compatibility flags, registering assets and prefabs, or correcting a broken mod layout.
+description: Create and organize Don't Starve Together mod skeletons. Use when starting a mod, writing modinfo.lua, modmain.lua, modworldgenmain.lua, or modservercreationmain.lua, defining configuration options and compatibility flags, registering assets and prefabs, or correcting a broken mod layout.
 ---
 
 # DST 模组脚手架
@@ -9,11 +9,11 @@ description: Create and organize Don't Starve Together mod skeletons. Use when s
 
 ## 工作流
 
-1. 确认目标是服务器模组、所有客户端必装模组、纯客户端模组、世界生成模组还是前端模组。
+1. 确认目标是客户端可不安装的服务器模组、所有客户端必装模组、纯客户端模组、世界生成模组还是建服前端扩展。
 2. 从 assets/minimal-mod/ 复制最小模板，只创建任务真正需要的入口和目录。
 3. 填写 modinfo.lua 的名称、描述、作者、版本、api_version、dst_compatible、客户端/服务器标志和 configuration_options。
-4. 在 modmain.lua 中声明 PrefabFiles、Assets、配置读取与运行时钩子；把世界生成和前端逻辑分别放入对应入口。
-5. 使用 modimport 或 require 组织 scripts/ 模块，明确 GLOBAL 访问，避免把大量实现堆在 modmain.lua。
+4. 在 modmain.lua 中声明 PrefabFiles、Assets、配置读取与普通运行时钩子；把世界生成注册放入 modworldgenmain.lua，把建服界面注册放入 modservercreationmain.lua。
+5. 用 require 加载返回值模块；用 modimport 执行依赖 AddAction、PostInit 等模组环境 API 的注册文件。require 模块直接使用游戏全局，modimport 文件才沿用入口的模组环境。
 6. 验证资源路径、Prefab 名称、配置数据类型、依赖关系和服务器过滤标记。
 7. 以无缓存重启方式分别测试禁用、启用、改配置、建新世界和载入旧世界。
 
@@ -21,7 +21,7 @@ description: Create and organize Don't Starve Together mod skeletons. Use when s
 
 - mods.lua、modindex.lua：入口加载、modinfo 校验、优先级和依赖。
 - modutil.lua：GetModConfigData、Prefab、Asset 及各类 Add 开头的公开 API。
-- frontend.lua、worldgen_main.lua：前端和世界生成上下文。
+- mods.lua、frontend.lua、worldgen_main.lua：建服前端的部分加载与世界生成上下文。
 
 ## 不变量
 
@@ -40,4 +40,3 @@ description: Create and organize Don't Starve Together mod skeletons. Use when s
 
 - 复制 assets/minimal-mod/ 创建新模组。
 - 需要入口和兼容标志说明时读取 references/entrypoints.md。
-

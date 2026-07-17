@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Performance Profiling"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-performance-profiling to implement and verify this DST mod task."
+  display_name: 'DST Performance Profiling'
+  short_description: 'Profile and optimize DST mod performance safely'
+  default_prompt: 'Use $dst-performance-profiling to implement and verify this DST mod task.'

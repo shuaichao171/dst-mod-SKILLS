@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Audio Camera Effects"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-audio-camera-effects to implement and verify this DST mod task."
+  display_name: 'DST Audio Camera Effects'
+  short_description: 'Integrate DST audio camera and local effects'
+  default_prompt: 'Use $dst-audio-camera-effects to implement and verify this DST mod task.'

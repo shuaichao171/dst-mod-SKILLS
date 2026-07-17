@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Stategraph Authoring"
-  short_description: "DST stategraph authoring implementation and verification"
-  default_prompt: "Use $dst-stategraph-authoring to implement and verify this DST mod task."
+  display_name: 'DST StateGraph Authoring'
+  short_description: 'Build interrupt-safe DST stategraphs'
+  default_prompt: 'Use $dst-stategraph-authoring to implement and verify this DST mod task.'

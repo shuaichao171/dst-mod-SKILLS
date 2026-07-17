@@ -17,11 +17,13 @@
 ## 网络 Prefab 顺序
 
 1. AddNetwork。
-2. 创建 netvar 或让 Replica 创建 netvar。
+2. 创建直接挂在实体上的 netvar 及其 dirty 监听。
 3. 添加客户端所需标签和视觉初值。
 4. SetPristine。
 5. 非主机返回。
-6. 主机添加 Component 和权威逻辑。
+6. 主机添加 Component 和权威逻辑；对于已注册的可复制 Component，AddComponent 会先调用 ReplicateComponent，再构造服务器 Component。
+
+Replica 的网络字段不等同于 Prefab 直接网络字段。服务器可在 SetPristine 后由 AddComponent 构造 Replica；客户端在实体初始标签反序列化后由 ReplicateEntity 构造对应 Replica。必须在相关实体出现前调用 AddReplicableComponent，使两端都知道该组件可复制。
 
 ## RPC 校验
 
@@ -39,4 +41,3 @@
 ## 测试矩阵
 
 主机玩家、远端客户端、专服、加入中客户端、断线重连、Master、Caves、高延迟、服务器拒绝、回滚。
-

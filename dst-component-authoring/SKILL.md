@@ -14,7 +14,7 @@ description: Design and implement Don't Starve Together Lua components and repli
 3. 通过 StartUpdatingComponent、任务或事件三者中成本最低的机制驱动更新；静态实体避免每帧 OnUpdate。
 4. 实现必要的 OnSave、OnLoad、LoadPostPass、LongUpdate、OnRemoveFromEntity 和 GetDebugString。
 5. 在 Prefab 的主机分支 AddComponent；修改原版组件时优先 AddComponentPostInit。
-6. 客户端需要状态或方法时创建 name_replica.lua，在 modmain.lua 先 AddReplicableComponent，并用 netvar dirty 事件提供数据。
+6. 客户端需要状态或方法时创建 name_replica.lua，并在相关实体实例化前从 modmain.lua 调用 AddReplicableComponent。Replica 可在构造函数中创建 netvar；服务器 AddComponent 会先调用 ReplicateComponent，再构造服务器 Component。
 7. 若组件参与动作，注册正确类型的 AddComponentAction，并保持客户端收集动作与服务器执行条件一致。
 
 ## 源码锚点
@@ -42,4 +42,3 @@ description: Design and implement Don't Starve Together Lua components and repli
 
 - 复制 assets/component-template.lua 和 assets/replica-template.lua。
 - 需要生命周期与复制边界时读取 references/component-contract.md。
-

@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Component Authoring"
-  short_description: "DST component authoring implementation and verification"
-  default_prompt: "Use $dst-component-authoring to implement and verify this DST mod task."
+  display_name: 'DST Component Authoring'
+  short_description: 'Build DST components and client replicas'
+  default_prompt: 'Use $dst-component-authoring to implement and verify this DST mod task.'

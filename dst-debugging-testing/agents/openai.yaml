@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Debugging Testing"
-  short_description: "DST debugging testing implementation and verification"
-  default_prompt: "Use $dst-debugging-testing to implement and verify this DST mod task."
+  display_name: 'DST Debugging Testing'
+  short_description: 'Diagnose DST mods with repeatable tests'
+  default_prompt: 'Use $dst-debugging-testing to implement and verify this DST mod task.'

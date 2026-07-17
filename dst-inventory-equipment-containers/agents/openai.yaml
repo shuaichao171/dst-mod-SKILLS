@@ -1,0 +1,4 @@
+interface:
+  display_name: 'DST Inventory Equipment Containers'
+  short_description: 'Build DST items equipment and containers'
+  default_prompt: 'Use $dst-inventory-equipment-containers to implement and verify this DST mod task.'

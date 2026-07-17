@@ -21,7 +21,7 @@ description: Create reusable Don't Starve Together UI widgets. Use when subclass
 
 - widgets/widget.lua、image.lua、text.lua、uianim.lua、button.lua、imagebutton.lua。
 - widgets/grid.lua、pagedlist.lua、dropdown.lua、spinner 类 Widget。
-- widgets/controls.lua 与 screens/screen.lua：父级、焦点和输入。
+- widgets/controls.lua 与 widgets/screen.lua：父级、焦点和输入。
 - frontend.lua、input.lua：前端与输入分发。
 
 ## 不变量
@@ -41,4 +41,3 @@ description: Create reusable Don't Starve Together UI widgets. Use when subclass
 
 - 复制 assets/widget-template.lua 创建 Widget。
 - 需要坐标、焦点和生命周期时读取 references/widget-contract.md。
-

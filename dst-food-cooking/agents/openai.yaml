@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Food Cooking"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-food-cooking to implement and verify this DST mod task."
+  display_name: 'DST Food Cooking'
+  short_description: 'Build foods cooker recipes and edible effects'
+  default_prompt: 'Use $dst-food-cooking to implement and verify this DST mod task.'

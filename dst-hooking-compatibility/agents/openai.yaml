@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Hooking Compatibility"
-  short_description: "DST hooking compatibility implementation and verification"
-  default_prompt: "Use $dst-hooking-compatibility to implement and verify this DST mod task."
+  display_name: 'DST Hooking Compatibility'
+  short_description: 'Apply compatible DST hooks and wrappers'
+  default_prompt: 'Use $dst-hooking-compatibility to implement and verify this DST mod task.'

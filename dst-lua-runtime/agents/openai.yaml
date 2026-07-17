@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Lua Runtime"
-  short_description: "DST lua runtime implementation and verification"
-  default_prompt: "Use $dst-lua-runtime to implement and verify this DST mod task."
+  display_name: 'DST Lua Runtime'
+  short_description: 'Work safely with DST Lua runtime behavior'
+  default_prompt: 'Use $dst-lua-runtime to implement and verify this DST mod task.'

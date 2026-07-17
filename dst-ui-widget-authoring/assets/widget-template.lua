@@ -1,11 +1,10 @@
-local Class = GLOBAL.Class
-local Widget = GLOBAL.require('widgets/widget')
-local Text = GLOBAL.require('widgets/text')
+local Widget = require('widgets/widget')
+local Text = require('widgets/text')
 
 local ModWidget = Class(Widget, function(self)
     Widget._ctor(self, 'ModWidget')
 
-    self.label = self:AddChild(Text(GLOBAL.BODYTEXTFONT, 24, ''))
+    self.label = self:AddChild(Text(BODYTEXTFONT, 24, ''))
     self.label:SetPosition(0, 0)
     self:SetValue('')
 end)
@@ -28,4 +27,3 @@ function ModWidget:Kill()
 end
 
 return ModWidget
-

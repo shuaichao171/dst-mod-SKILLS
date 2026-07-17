@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Combat Weapons Projectiles"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-combat-weapons-projectiles to implement and verify this DST mod task."
+  display_name: 'DST Combat Weapons Projectiles'
+  short_description: 'Implement DST combat weapons and projectiles'
+  default_prompt: 'Use $dst-combat-weapons-projectiles to implement and verify this DST mod task.'

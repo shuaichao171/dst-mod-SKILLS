@@ -10,11 +10,11 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 ## 工作流
 
 1. 从相同实体类型和相同动作的原版 SG 状态开始，记录进入条件、标签、动画、时间线、退出路径和事件。
-2. 用 State 定义唯一名称、tags、onenter、timeline、events、ontimeout 和 onexit；所有临时数据放入 inst.sg.statemem。
-3. onenter 先验证参数与组件，再停止或配置 locomotor、播放动画、设置 timeout 和启动 BufferedAction。
-4. TimeEvent 使用 FRAMES 或明确秒数；伤害、消耗和生成等权威副作用只在服务器 SG 的单一时间点执行。
-5. 为 animover、animqueueover、timeout、attacked、death 和动作取消提供明确转移。
-6. onexit 撤销碰撞、控制锁、颜色、速度、任务、声音或临时标签，且允许状态被提前打断。
+2. 独立 SG 使用 stategraphs/SGmod_entity.lua 模块名，并让 inst:SetStateGraph('SGmod_entity') 与文件名一致；StateGraph 内部名称使用 mod_entity。
+3. 用 State 定义唯一名称、tags、onenter、timeline、events、ontimeout 和 onexit；所有临时数据放入 inst.sg.statemem。
+4. 为非 instant BufferedAction 提供 ActionHandler。PushBufferedAction 调用 StartAction 查找 actionhandlers，普通 doaction EventHandler 不能替代它。
+5. onenter 验证参数与组件并启动动作；TimeEvent 使用 FRAMES 或明确秒数，权威副作用只在服务器 SG 的单一时间点执行。
+6. 为动画结束、timeout、attacked、death 和动作取消提供明确转移；onexit 对称撤销物理、控制、视觉、任务、声音和临时标签。
 7. 修改玩家动作时同时检查 SGwilson 与客户端 SG，验证预测、回正和 ServerStateMatches。
 
 ## 源码锚点
@@ -41,4 +41,3 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 
 - 复制 assets/stategraph-template.lua 创建独立 SG。
 - 需要状态契约和玩家预测时读取 references/stategraph-contract.md。
-

@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Assets Animation Atlas"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-assets-animation-atlas to implement and verify this DST mod task."
+  display_name: 'DST Assets Animation Atlas'
+  short_description: 'Integrate DST animation atlas and texture assets'
+  default_prompt: 'Use $dst-assets-animation-atlas to implement and verify this DST mod task.'

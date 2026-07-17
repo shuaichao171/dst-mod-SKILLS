@@ -10,7 +10,7 @@ description: Set up and test Don't Starve Together mods on dedicated servers and
 ## 工作流
 
 1. 确认 Cluster、Master、Caves、modoverrides.lua、dedicated_server_mods_setup.lua 和模组目录的实际位置，不覆盖现有服务器配置。
-2. 核对 modinfo 的 client_only_mod、server_only_mod、all_clients_require_mod、版本和依赖是否符合部署方式。
+2. 核对 modinfo 的 client_only_mod、all_clients_require_mod、版本和依赖是否符合纯客户端、全客户端必装或客户端可不安装的服务器部署方式；不要依赖当前加载器不识别的 server_only_mod。
 3. 备份目标测试 Cluster；使用独立测试世界和端口启动 Master，再启动 Caves，保存完整启动日志。
 4. 从远端客户端加入，验证握手、资源、Prefab、RPC、Replica、角色和 UI，而不是只观察服务器控制台。
 5. 执行建新世界、保存、重启、洞穴往返、断线重连、回滚、空服务器运行和版本不一致场景。
@@ -36,4 +36,3 @@ description: Set up and test Don't Starve Together mods on dedicated servers and
 - Master、Caves 和至少一个远端客户端完成目标测试。
 - 关服重启和回滚后状态一致。
 - 报告明确列出实际执行命令、环境、日志结果和未执行项。
-

@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Localization Speech"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-localization-speech to implement and verify this DST mod task."
+  display_name: 'DST Localization Speech'
+  short_description: 'Localize DST UI content and character speech'
+  default_prompt: 'Use $dst-localization-speech to implement and verify this DST mod task.'

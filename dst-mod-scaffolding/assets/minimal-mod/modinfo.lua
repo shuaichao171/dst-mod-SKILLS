@@ -8,7 +8,6 @@ dst_compatible = true
 
 client_only_mod = false
 all_clients_require_mod = true
-server_only_mod = false
 
 configuration_options =
 {
@@ -23,4 +22,3 @@ configuration_options =
         default = true,
     },
 }
-

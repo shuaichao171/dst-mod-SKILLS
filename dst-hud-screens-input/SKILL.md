@@ -19,7 +19,7 @@ description: Integrate Don't Starve Together HUD elements, screens, popups, over
 
 ## 源码锚点
 
-- screens/playerhud.lua、screens/screen.lua、screens/popupdialog.lua。
+- screens/playerhud.lua、widgets/screen.lua、screens/popupdialog.lua。
 - widgets/controls.lua、widgets/badge.lua、widgets/overlay 类文件。
 - input.lua、frontend.lua。
 - modutil.lua：AddClassPostConstruct、AddPopup、SetModHUDFocus。
@@ -36,4 +36,3 @@ description: Integrate Don't Starve Together HUD elements, screens, popups, over
 - 打开关闭、死亡重建和断线重连后只有一个 UI 实例。
 - 聊天、制作、地图和暂停界面仍能正常获得焦点。
 - 远端客户端界面不访问主机专属数据。
-

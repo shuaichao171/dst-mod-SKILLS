@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Ui Widget Authoring"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-ui-widget-authoring to implement and verify this DST mod task."
+  display_name: 'DST UI Widget Authoring'
+  short_description: 'Build reusable controller-safe DST widgets'
+  default_prompt: 'Use $dst-ui-widget-authoring to implement and verify this DST mod task.'

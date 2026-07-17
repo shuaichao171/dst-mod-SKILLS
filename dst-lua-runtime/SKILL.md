@@ -11,8 +11,8 @@ description: Work safely with the Don't Starve Together Lua runtime and mod envi
 
 1. 识别代码运行于 modinfo、前端、世界生成、服务器、客户端还是分片上下文。
 2. 沿 class.lua、metaclass.lua 和目标类的 Class 构造追踪继承与方法查找。
-3. 优先使用局部变量；仅通过明确的 GLOBAL 引用访问游戏全局，不向全局表泄漏临时符号。
-4. 用 require 加载游戏模块，用 modimport 加载模组内文件；确认缓存语义和返回值。
+3. 优先使用局部变量；在模组入口或 modimport 文件中用入口注入的 API，并在确需访问 _G 时使用 GLOBAL；在 require 加载的 Prefab、Component、Replica、Brain、SG 和 Widget 模块中直接使用游戏全局。
+4. 用 require 加载有返回值且需要 package.loaded 缓存的模块；只用 modimport 执行需要模组环境 API 的注册文件。不要依赖 modimport 的返回值或缓存。
 5. 修改闭包或 upvalue 前先证明公开钩子不足，并准备版本变化后的失败检测。
 6. 创建任务、线程或回调时记录所有者，并在实体移除、Widget 销毁或状态退出时取消。
 7. 用实际堆栈和最小复现验证 nil、环境、递归 require、闭包捕获及返回值问题。
@@ -26,6 +26,7 @@ description: Work safely with the Don't Starve Together Lua runtime and mod envi
 ## 不变量
 
 - 不要假设所有入口拥有相同全局表或 TheWorld、ThePlayer。
+- 不要把模组入口环境中的 GLOBAL 写法复制到引擎通过 require 加载的模块。
 - 不要无条件覆盖原函数；包装时保留可变参数、多返回值和 self。
 - 不要依赖未验证的 upvalue 名称或索引。
 - 不要在模块加载阶段执行依赖已生成世界或玩家的逻辑。
@@ -36,3 +37,6 @@ description: Work safely with the Don't Starve Together Lua runtime and mod envi
 - 补丁在原函数缺失、签名变化和重复加载时可安全失败。
 - 任务和事件回调没有在所有者销毁后继续运行。
 
+## 按需资源
+
+- 需要判断 require、modimport 与引擎模块环境时读取 references/module-environments.md。

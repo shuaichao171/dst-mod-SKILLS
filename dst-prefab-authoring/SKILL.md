@@ -11,7 +11,7 @@ description: Create and modify Don't Starve Together prefab entities. Use when w
 
 1. 在 prefabs/ 中寻找同类别原版实体，比较至少一个简单范例和一个拥有相同网络或持久化需求的范例。
 2. 声明 Asset、PrefabFiles 依赖和局部回调；创建 Entity，并按需求添加 Transform、AnimState、SoundEmitter、Physics、Network、Light、Follower 或 VFXEffect。
-3. 在 SetPristine 前完成所有客户端也必须看到的标签、AnimState 初值、网络变量和原生 Entity 子系统。
+3. 在 SetPristine 前完成客户端必须立即看到的标签、AnimState 初值、直接挂在实体上的网络变量和原生 Entity 子系统。
 4. 调用 inst.entity:SetPristine()，随后在 not TheWorld.ismastersim 分支立即返回客户端实例。
 5. 仅在主机分支添加普通 Component、Brain、服务器 SG、掉落、计时、保存和权威事件逻辑。
 6. 为 OnSave、OnLoad、LoadPostPass、OnRemoveEntity、OnEntitySleep 和 OnEntityWake 明确生命周期责任。
@@ -26,7 +26,7 @@ description: Create and modify Don't Starve Together prefab entities. Use when w
 
 ## 不变量
 
-- Network、netvar 和客户端所需标签必须在 SetPristine 前建立。
+- Network、Prefab 直接创建的 netvar 和客户端所需初始标签必须在 SetPristine 前建立；可复制 Component 的 Replica 可由主机分支中的 AddComponent 触发构造。
 - 普通服务器 Component 不要在客户端分支访问；客户端读取 Replica 或网络变量。
 - 不要仅凭方法名猜引擎原生参数；从多个 Prefab 调用点验证。
 - 所有周期任务、事件监听和子实体都要有明确清理路径。
@@ -42,4 +42,3 @@ description: Create and modify Don't Starve Together prefab entities. Use when w
 
 - 复制 assets/prefab-template.lua 作为网络 Prefab 起点。
 - 需要构造顺序和范例选择时读取 references/prefab-contract.md。
-

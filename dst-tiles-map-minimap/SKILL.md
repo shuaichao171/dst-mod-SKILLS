@@ -22,7 +22,7 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 - tilemanager.lua、tiledefs.lua、worldtiledefs.lua、tilegroups.lua。
 - modutil.lua：RegisterTileRange、AddTile、SetTileProperty 与 Minimap API。
 - map/terrain.lua、map/rooms.lua、map/static_layouts/。
-- prefabs/turf_*.lua、MiniMapEntity 使用范例。
+- prefabs/turfs.lua、MiniMapEntity 使用范例。
 
 ## 不变量
 
@@ -36,4 +36,3 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 - 新世界能生成地皮，旧存档能重载而不改变已有 ID。
 - 铺设、挖起、地图显示和 Minimap 显示一致。
 - 与另一个自定义地皮模组同时启用时无 ID 冲突。
-

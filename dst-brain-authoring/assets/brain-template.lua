@@ -1,8 +1,4 @@
-local Class = GLOBAL.Class
-local Brain = GLOBAL.Brain
-local BT = GLOBAL.BT
-local PriorityNode = GLOBAL.PriorityNode
-local Wander = GLOBAL.require('behaviours/wander')
+require('behaviours/wander')
 
 local ModBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
@@ -18,4 +14,3 @@ function ModBrain:OnStart()
 end
 
 return ModBrain
-

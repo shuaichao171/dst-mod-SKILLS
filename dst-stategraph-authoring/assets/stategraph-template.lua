@@ -1,8 +1,11 @@
-local StateGraph = GLOBAL.StateGraph
-local State = GLOBAL.State
-local EventHandler = GLOBAL.EventHandler
-local TimeEvent = GLOBAL.TimeEvent
-local FRAMES = GLOBAL.FRAMES
+-- Save as scripts/stategraphs/SGmod_entity.lua and load with
+-- inst:SetStateGraph('SGmod_entity'). Register the action before this module loads.
+assert(ACTIONS.MOD_INTERACT ~= nil, 'Register MOD_INTERACT before loading SGmod_entity')
+
+local actionhandlers =
+{
+    ActionHandler(ACTIONS.MOD_INTERACT, 'act'),
+}
 
 local states =
 {
@@ -49,14 +52,6 @@ local states =
     },
 }
 
-local events =
-{
-    EventHandler('doaction', function(inst)
-        if not inst.sg:HasStateTag('busy') then
-            inst.sg:GoToState('act')
-        end
-    end),
-}
+local events = {}
 
-return StateGraph('mod_entity', states, events, 'idle')
-
+return StateGraph('mod_entity', states, events, 'idle', actionhandlers)

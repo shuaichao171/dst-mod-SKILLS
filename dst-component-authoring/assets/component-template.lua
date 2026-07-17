@@ -1,5 +1,3 @@
-local Class = GLOBAL.Class
-
 local ModState = Class(function(self, inst)
     self.inst = inst
     self.enabled = false
@@ -13,7 +11,7 @@ function ModState:SetEnabled(enabled)
 
     self.enabled = enabled
 
-    if self.inst.replica.mod_state ~= nil then
+    if self.inst.replica ~= nil and self.inst.replica.mod_state ~= nil then
         self.inst.replica.mod_state:SetEnabled(enabled)
     end
 
@@ -41,4 +39,3 @@ function ModState:GetDebugString()
 end
 
 return ModState
-

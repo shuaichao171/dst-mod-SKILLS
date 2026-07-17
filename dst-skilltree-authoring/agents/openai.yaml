@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Skilltree Authoring"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-skilltree-authoring to implement and verify this DST mod task."
+  display_name: 'DST Skill Tree Authoring'
+  short_description: 'Build persistent network-safe DST skill trees'
+  default_prompt: 'Use $dst-skilltree-authoring to implement and verify this DST mod task.'

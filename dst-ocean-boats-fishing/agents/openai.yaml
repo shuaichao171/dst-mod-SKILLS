@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Ocean Boats Fishing"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-ocean-boats-fishing to implement and verify this DST mod task."
+  display_name: 'DST Ocean Boats Fishing'
+  short_description: 'Build DST boats ocean systems and fishing'
+  default_prompt: 'Use $dst-ocean-boats-fishing to implement and verify this DST mod task.'

@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Creature Boss Authoring"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-creature-boss-authoring to implement and verify this DST mod task."
+  display_name: 'DST Creature Boss Authoring'
+  short_description: 'Orchestrate complete DST creatures and bosses'
+  default_prompt: 'Use $dst-creature-boss-authoring to implement and verify this DST mod task.'

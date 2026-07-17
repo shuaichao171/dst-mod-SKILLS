@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Networking Rpc"
-  short_description: "DST networking rpc implementation and verification"
-  default_prompt: "Use $dst-networking-rpc to implement and verify this DST mod task."
+  display_name: 'DST Networking RPC'
+  short_description: 'Implement secure DST replication and RPC'
+  default_prompt: 'Use $dst-networking-rpc to implement and verify this DST mod task.'

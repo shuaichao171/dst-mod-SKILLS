@@ -1,4 +1,4 @@
 interface:
-  display_name: "DST Status Buffs Survival"
-  short_description: "Build and verify DST mod systems safely"
-  default_prompt: "Use $dst-status-buffs-survival to implement and verify this DST mod task."
+  display_name: 'DST Status Buffs Survival'
+  short_description: 'Build DST survival stats buffs and debuffs'
+  default_prompt: 'Use $dst-status-buffs-survival to implement and verify this DST mod task.'
