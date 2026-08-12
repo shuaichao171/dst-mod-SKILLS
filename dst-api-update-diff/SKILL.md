@@ -27,7 +27,7 @@ description: Compare Don't Starve Together Lua source across game updates and as
 ## 不变量
 
 - 快照和比较只读访问游戏 data/scripts。
-- 快照输出必须是源码树外的 `.json`；比较报告不得覆盖任一输入快照。
+- 快照输出和比较报告必须是源码树外的 `.json`；比较报告不得覆盖任一输入快照。
 - 文件哈希变化不等于 API 破坏，必须检查目标调用契约。
 - 函数索引必须覆盖 function Name(...) 与 Name = function(...) 两种常见定义形式；抽查 modutil.lua 中的 env.Add* 包装器，避免漏掉模组公开边界。
 - 不要把内部字段稳定性等同于公开 API 保证。
@@ -37,7 +37,7 @@ description: Compare Don't Starve Together Lua source across game updates and as
 
 - 报告中的每项影响都能链接到差异文件和模组使用点。
 - 关键网络、存档、SG 与世界生成变化有专门回归项。
-- 脚本在不存在目录、空目录和相同目录时给出明确结果；比较器拒绝非数组文件表、重复路径和无效SHA-256的损坏快照。
+- 脚本在不存在目录、空目录和相同目录时给出明确结果；比较器拒绝非数组文件表、非规范相对 `/` 路径、忽略大小写后的重复路径、无效 SHA-256 和无效 `source_root` 的损坏快照。
 
 ## 按需资源
 

@@ -30,9 +30,17 @@ switch ($Mode) {
     }
 
     'Files' {
-        Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter $Glob |
-            Sort-Object FullName |
-            Select-Object -ExpandProperty FullName
+        $files = @(
+            Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter $Glob |
+                Sort-Object FullName |
+                Select-Object -ExpandProperty FullName
+        )
+        if ($files.Count -eq 0) {
+            Write-Host 'No files matched.'
+        }
+        else {
+            $files
+        }
     }
 
     'Symbol' {
@@ -43,17 +51,27 @@ switch ($Mode) {
         $rg = Get-Command rg -ErrorAction SilentlyContinue
         if ($null -ne $rg) {
             & $rg.Source -n --glob $Glob -- $Pattern $resolvedRoot
-            if ($LASTEXITCODE -gt 1) {
+            if ($LASTEXITCODE -eq 1) {
+                Write-Host 'No symbol matches.'
+            }
+            elseif ($LASTEXITCODE -gt 1) {
                 throw ('rg failed with exit code ' + $LASTEXITCODE)
             }
         }
         else {
-            Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter $Glob |
-                Select-String -Pattern $Pattern |
-                ForEach-Object {
-                    '{0}:{1}:{2}' -f $_.Path, $_.LineNumber, $_.Line.Trim()
-                }
+            $matches = @(
+                Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter $Glob |
+                    Select-String -Pattern $Pattern -CaseSensitive |
+                    ForEach-Object {
+                        '{0}:{1}:{2}' -f $_.Path, $_.LineNumber, $_.Line.Trim()
+                    }
+            )
+            if ($matches.Count -eq 0) {
+                Write-Host 'No symbol matches.'
+            }
+            else {
+                $matches
+            }
         }
     }
 }
-

@@ -40,5 +40,5 @@ description: Research and trace Don't Starve Together Lua source. Use when locat
 
 ## 按需资源
 
-- 运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/scan-dst-source.ps1 -Mode Summary` 生成结构清单；符号检索再传 `-Mode Symbol -Pattern <pattern>`。显式的进程级 Bypass 只作用于本次命令，可兼容禁止直接执行本地 `.ps1` 的 Windows 环境。
+- 运行 `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/scan-dst-source.ps1 -Mode Summary` 生成结构清单；文件检索传 `-Mode Files -Glob <glob>`，符号检索传 `-Mode Symbol -Pattern <pattern>`。Files 或 Symbol 无匹配时脚本会给出明确消息并成功退出。显式的进程级 Bypass 只作用于本次命令，可兼容禁止直接执行本地 `.ps1` 的 Windows 环境。
 - 需要搜索策略和原生 API 边界时读取 references/source-research.md。
