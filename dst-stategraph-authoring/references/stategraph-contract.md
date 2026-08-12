@@ -27,6 +27,24 @@ State 负责短期、可中断的动作与动画时序。持久数值、阶段�
 
 伤害、消耗、生成和掉落只在服务器发生。
 
+## 玩家碰撞
+
+玩家 State 临时取消与其他角色的碰撞时，复用 SGwilson 的直接 Physics 模式：
+
+```lua
+-- onenter
+inst.Physics:ClearCollidesWith(COLLISION.CHARACTERS)
+
+-- onexit
+inst.Physics:Stop()
+inst.Physics:CollidesWith(COLLISION.CHARACTERS)
+inst.Physics:Teleport(inst.Transform:GetWorldPosition())
+```
+
+- 不要在玩家 SG State 中调用 ToggleOffCharacterCollisions 或 ToggleOnCharacterCollisions。这两个通用辅助函数会操作 inst.sg.mem.ischaracterpassthrough、radius 和 physicstask；恢复时还会启动周期任务。
+- death 或其他强制状态切换可能清理或覆盖 sg.mem.physicstask，但已调度的 OnUpdatePhysicsRadius 仍可能运行，随后对 nil physicstask 调用 Cancel 并使服务器崩溃。
+- 除非明确把碰撞所有权移交给相邻状态，否则在 onexit 对称恢复碰撞。链式状态应仿照 SGwilson 用 statemem 标记是否由下一状态继续持有碰撞修改。
+
 ## 独立 SG 的装载与动作
 
 - 将模块保存为 scripts/stategraphs/SGmod_entity.lua，并调用 inst:SetStateGraph('SGmod_entity')；entityscript.lua 会 require stategraphs/SGmod_entity。

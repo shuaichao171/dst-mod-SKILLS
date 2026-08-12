@@ -27,6 +27,50 @@ Replica 的网络字段不等同于 Prefab 直接网络字段。服务器可在 
 
 ## RPC 校验
 
+### 实体参数
+
+RPC 需要传递接收端可见的网络实体时，直接传 Entity。DST 的 RPC 序列化层会把实体参数映射为接收端对应的实体引用；接收端仍必须处理 `nil`、已移除实体和非法参数。
+
+实体参数只能映射接收端已经复制到的实体。服务端刚 `SpawnPrefab` 后不要在同一帧发送依赖该实体的 Client Mod RPC；先等待实体复制，或在严格流程中让客户端确认实体可见后再发送。否则 RPC 可能先于实体出现，处理器只能得到不可用参数；绑定在该实体上的 Talker、动画等瞬时表现也可能一起丢失。固定延时只适合本地测试辅助，正式玩法优先使用已有实体或显式确认。
+
+```lua
+-- 服务端通知指定客户端
+SendModRPCToClient(CLIENT_MOD_RPC.example.invite, invitee.userid, inviter)
+
+AddClientModRPCHandler("example", "invite", function(inviter)
+    if inviter == nil or not inviter:IsValid() then
+        return
+    end
+    SendModRPCToServer(MOD_RPC.example.accept, inviter)
+end)
+
+-- 客户端请求服务端；处理器首参 player 是实际请求者
+AddModRPCHandler("example", "accept", function(player, inviter)
+    if type(inviter) ~= "table" or inviter.IsValid == nil or not inviter:IsValid() then
+        return
+    end
+    -- 在服务端继续校验 inviter、player、距离、状态和权限
+end)
+```
+
+禁止把一端的 `entity.GUID` 当作跨网络身份，并在另一端执行 `Ents[guid]`：
+
+```lua
+-- 错误：服务端 GUID 不能交给客户端的 Ents 查找，反向同理
+SendModRPCToClient(CLIENT_MOD_RPC.example.invite, invitee.userid, inviter.GUID)
+AddClientModRPCHandler("example", "invite", function(inviter_guid)
+    local inviter = Ents[inviter_guid]
+end)
+```
+
+主机客户端与服务端处于同一进程，可能让这种错误在主机测试中偶然可用。因此，任何携带实体参数的双向 RPC 都必须用远端客户端复测；不要用主机通过作为 GUID 方案正确的证据。
+
+### 预测动作 RPC
+
+开启延迟补偿时，`preview_cb` 通常在客户端走到目标并进入预测动作时发送 RPC，但服务端权威坐标可能仍落后。处理器若立即调用带距离校验的最终函数，会被服务端拒绝，而客户端只留下预测动作动画。
+
+让预测与非预测回调汇合到同一服务端动作入口。需要走近目标的交互应在服务端重建 `BufferedAction` 并交给 `locomotor:PushAction`，或使用对应的原版动作 RPC；在服务端动作帧再执行最终状态变更和距离校验。不要让 `preview_cb` 直接调用最终逻辑、`non_preview_cb` 却走服务端 locomotor。
+
 服务器接收客户端请求后重新检查：
 
 - player 或 sender 有效且存活

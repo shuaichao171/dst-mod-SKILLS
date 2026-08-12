@@ -15,7 +15,7 @@ description: Implement and debug Don't Starve Together multiplayer replication a
 4. 选择最小 net 类型；状态用 netvar，瞬时通知才使用 net_event，并在 dirty 回调中只更新表现或缓存。
 5. 客户端需要组件式接口时创建 Replica，并在相关实体实例化前从 modmain.lua 调用 AddReplicableComponent；保持 Replica 方法对缺失数据返回安全值。
 6. 按方向选择 AddModRPCHandler、AddClientModRPCHandler 或 AddShardModRPCHandler；在接收端重新校验玩家、实体、距离、权限、冷却和参数范围。
-7. 预测动作必须可由服务器结果纠正；分别测试主机玩家、远端客户端、专服和洞穴分片。
+7. 预测与非预测客户端必须汇合到同一服务端动作入口；`preview_cb` 不要绕过服务端 locomotor 直接执行依赖距离的最终逻辑。预测动作必须可由服务器结果纠正；分别测试主机玩家、远端客户端、专服和洞穴分片。
 
 ## 源码锚点
 
@@ -28,6 +28,7 @@ description: Implement and debug Don't Starve Together multiplayer replication a
 ## 不变量
 
 - 永远不信任客户端传来的实体、坐标、物品、数值或权限声明。
+- RPC 需要引用网络实体时直接传 Entity 参数，让引擎在接收端映射实体；发送前确保接收端已经复制到该实体，不要在生成实体的同一帧让 Client RPC 依赖它。禁止跨服务端与客户端传 `entity.GUID` 后再用 `Ents[guid]` 查找，因为两端 GUID/`Ents` 命名空间不能混用。收到实体后仍须在权威端校验其有效性、类型、距离和权限。
 - 不要在 RPC 中传递大型表或高频连续状态。
 - 不要依赖 ThePlayer 代表服务器请求者；使用处理器提供的 player 或 sender。
 - dirty 回调可能在对象初始化的不同阶段到达，必须允许依赖暂缺。
@@ -41,4 +42,4 @@ description: Implement and debug Don't Starve Together multiplayer replication a
 
 ## 按需资源
 
-- 需要方向、权威与 Replica 选择时读取 references/network-contract.md。
+- 需要方向、权威、实体参数与 Replica 选择时读取 references/network-contract.md。

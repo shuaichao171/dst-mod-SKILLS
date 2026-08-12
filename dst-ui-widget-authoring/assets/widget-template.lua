@@ -1,16 +1,42 @@
-local Widget = require('widgets/widget')
-local Text = require('widgets/text')
+local Widget = require("widgets/widget")
+local Text = require("widgets/text")
 
 local ModWidget = Class(Widget, function(self)
-    Widget._ctor(self, 'ModWidget')
+    Widget._ctor(self, "ModWidget")
 
-    self.label = self:AddChild(Text(BODYTEXTFONT, 24, ''))
-    self.label:SetPosition(0, 0)
-    self:SetValue('')
+    self.label = self:AddChild(Text(BODYTEXTFONT, 24, ""))
+    self.label:SetRegionSize(260, 36)
+    self.label:SetHAlign(ANCHOR_MIDDLE)
+    self.label:SetClickable(false)
+
+    -- Keep the function identity so rebinding can remove the old listener.
+    self._onvaluechanged = function()
+        self:Refresh()
+    end
 end)
 
-function ModWidget:SetValue(value)
-    self.label:SetString(tostring(value or ''))
+function ModWidget:SetDataSource(source)
+    if self.source == source then
+        return
+    end
+
+    if self.source ~= nil then
+        self.inst:RemoveEventCallback("myvaluedirty", self._onvaluechanged, self.source)
+    end
+
+    self.source = source
+
+    if self.source ~= nil then
+        -- Replace the event name and value lookup with the replica/local data you own.
+        self.inst:ListenForEvent("myvaluedirty", self._onvaluechanged, self.source)
+    end
+
+    self:Refresh()
+end
+
+function ModWidget:Refresh()
+    local value = self.source ~= nil and self.source.value or nil
+    self.label:SetString(value ~= nil and tostring(value) or "")
 end
 
 function ModWidget:OnControl(control, down)
@@ -22,7 +48,8 @@ function ModWidget:OnControl(control, down)
 end
 
 function ModWidget:Kill()
-    -- Remove external event and input callbacks before the base Kill.
+    -- Remove a replaceable source early; entity removal clears any remaining listeners.
+    self:SetDataSource(nil)
     ModWidget._base.Kill(self)
 end
 
