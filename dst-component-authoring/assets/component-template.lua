@@ -15,7 +15,8 @@ function ModState:SetEnabled(enabled)
         self.inst.replica.mod_state:SetEnabled(enabled)
     end
 
-    self.inst:PushEvent('mod_state_dirty', { enabled = enabled })
+    -- Keep server domain events distinct from replica netvar dirty events.
+    self.inst:PushEvent('mod_state_changed', { enabled = enabled })
 end
 
 function ModState:IsEnabled()

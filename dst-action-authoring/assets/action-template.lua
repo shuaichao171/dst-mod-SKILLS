@@ -1,5 +1,6 @@
 -- This is a registration file. Load it from modmain.lua with modimport,
 -- because AddAction and AddComponentAction belong to the mod environment.
+-- Replace mod_interactable with a server component and client replica supplied by the mod.
 local ActionHandler = GLOBAL.ActionHandler
 
 local MOD_INTERACT = AddAction(

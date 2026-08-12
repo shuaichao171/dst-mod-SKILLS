@@ -36,6 +36,7 @@ python scripts/scml_parts_plan.py <角色.scml> --output <parts_plan.json>
 ```
 
 读取生成的JSON，按实际folder逐项制作。不要凭通用清单删减目标SCML已有部件。
+若条目含有 `source_image_error` 或 `source_path_case_mismatch`，先修复对应的损坏、不可读或大小写不一致源PNG；这些字段表示计划已保留SCML结构，但未能提取可选的源图Alpha元数据。计划、报告和预览使用各自的 `.json`/`.png` 输出路径；不要把预览写进部件根目录。
 
 需要判断头发、裙摆、披风、蝴蝶结或饰品如何分层时，读取 [references/dst-parts-spec.md](references/dst-parts-spec.md)。
 
@@ -98,7 +99,7 @@ python scripts/scml_parts_plan.py <角色.scml> --output <parts_plan.json>
 python scripts/audit_parts.py <parts目录> --plan <parts_plan.json> --report <audit.json> --contact-sheet <contact_sheet.png> --strict
 ```
 
-处理所有错误：缺图、尺寸不符、非模板占位帧的空Alpha、无透明通道。目标模板原本就是全透明的占位帧只记为警告；边缘触碰和重复图片也属于警告，结合模板判断是否合理。
+处理所有错误：缺图、路径大小写不一致、损坏或不可读图片、尺寸不符、非模板占位帧的空Alpha、无透明通道。DST素材路径必须与SCML中的大小写完全一致。目标模板原本就是全透明的占位帧只记为警告；边缘触碰和重复图片也属于警告，结合模板判断是否合理。
 
 ### 8. 交付与覆盖规则
 

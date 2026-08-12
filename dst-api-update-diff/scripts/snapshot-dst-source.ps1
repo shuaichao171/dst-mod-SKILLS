@@ -36,6 +36,16 @@ if (-not (Test-Path -LiteralPath (Join-Path $resolvedRoot 'main.lua') -PathType 
     throw ('The root does not look like a DST data/scripts directory: ' + $resolvedRoot)
 }
 
+$fullOutput = [System.IO.Path]::GetFullPath($OutputPath)
+if ([System.IO.Path]::GetExtension($fullOutput) -ine '.json') {
+    throw ('Output path must use a .json extension: ' + $fullOutput)
+}
+$rootPrefix = $resolvedRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) +
+    [System.IO.Path]::DirectorySeparatorChar
+if ($fullOutput.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Output path must be outside the read-only DST source root.'
+}
+
 $records = @(
     Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Filter '*.lua' |
         Sort-Object FullName |
@@ -64,7 +74,6 @@ $snapshot = [ordered]@{
     files = $records
 }
 
-$fullOutput = [System.IO.Path]::GetFullPath($OutputPath)
 $parent = Split-Path -Parent $fullOutput
 if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
     New-Item -ItemType Directory -Path $parent -Force | Out-Null

@@ -1,6 +1,6 @@
 # DST Mod Skills Catalog
 
-本工作区包含 45 个可独立触发的 Codex Skill。默认源码基线为：
+本工作区包含 46 个可独立触发的 Codex Skill。默认源码基线为：
 
     D:\steam\steamapps\common\Don't Starve Together\data\scripts
 
@@ -55,6 +55,7 @@
 | dst-hud-screens-input | HUD、Screen 与输入 |
 | dst-client-frontend-mods | 纯客户端和建服前端扩展 |
 | dst-assets-animation-atlas | 动画、Build、Atlas 与纹理 |
+| dst-character-parts | 按 Spriter/SCML 模板制作与审计人物透明 PNG 部件 |
 | dst-fx-vfx-authoring | FX 与粒子 |
 | dst-audio-camera-effects | 音频与相机表现 |
 | dst-localization-speech | 本地化与角色台词 |
