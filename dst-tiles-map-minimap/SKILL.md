@@ -18,9 +18,19 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 7. 实体地图图标使用 MiniMapEntity 和注册 Atlas，明确可见范围、图标和移除行为。
 8. 用新世界、存档重载、铺地/铲地、地图缩放和多个地皮模组组合测试。
 
+## 地面纹理合成与变暗排查
+
+- `ground_tile_def.name` 不是分类名。`tilemanager.lua` 会用它解析 `levels/tiles/<name>.tex` 和同名 Atlas；世界初始化时，`MapLayerManager:CreateRenderLayer` 会同时接收该基础图集与 `noise_texture`。因此 `noise_texture` 不是不经处理直接显示在地面上。
+- 选择基础图集时先检查其实际 RGB 内容，不能只看透明轮廓。原版 `cobblestone` 图集自带深色石路纹理，适合搭配白色噪声生成道路；若再与彩色自定义 `noise_texture` 合成，会明显压暗并混入石路细节。
+- 希望主要保留自定义 `noise_texture` 的颜色和质感时，优先参考原版 `COTL_BRICK` 等地皮使用近白色的 `blocky` 图集。若 `blocky` 的边缘形状不符合设计，再制作包含完整地块组合、同名 XML 元素和近白色 RGB 的专用基础图集。
+- 当源 PNG 或反解 TEX 正常、游戏内无角色滤镜时仍显著变暗，先对照解码后的 `levels/tiles/<name>.tex`，再检查环境光、季节 Colour Cube 和自定义后处理。不要在确认基础图集前反复提高源图亮度；压暗来自图集合成时，补偿源图会损失高光和材质层次。
+- DXT/RGB 压缩选择主要影响色块、细节和内存，不应造成整张地皮均匀大幅变暗。出现这种现象时优先排查基础图集和环境光。
+- 更换 `ground_tile_def.name`、Atlas 或地面 TEX 后完全退出并重启游戏再验证；地面渲染层在世界初始化时创建，前端重载模组不一定清除已有资源状态。
+
 ## 源码锚点
 
-- tilemanager.lua、tiledefs.lua、worldtiledefs.lua、tilegroups.lua。
+- tilemanager.lua：`GroundImage`、`GroundAtlas`、`ValidateGroundTileDef`；tiledefs.lua、worldtiledefs.lua、tilegroups.lua。
+- prefabs/world.lua：`MapLayerManager:CreateRenderLayer` 以及地皮颜色参数绑定。
 - modutil.lua：RegisterTileRange、AddTile、SetTileProperty 与 Minimap API。
 - map/terrain.lua、map/rooms.lua、map/static_layouts/。
 - prefabs/turfs.lua、MiniMapEntity 使用范例。
