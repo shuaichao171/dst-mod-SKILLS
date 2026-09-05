@@ -27,6 +27,7 @@ description: Analyze, design, create, modify, and audit Spriter SCML animation a
      ```
 
    - 对大语料先加 `--skip-image-checks`；交付目标必须启用 PNG 存在性和尺寸检查。
+   - 已有可编辑的源 SCML 和 PNG 时，只修改源工程并用官方 Mod Tools 重新编译；不得把反编译 SCML 当作二次修改源。反编译仅用于参考，或核对最终包的 bank、build、动作、pivot、贴图和编译一致性。确实没有源工程且任务要求恢复资产时，明确记录重建依据和元数据损失风险。
 5. 写动作规格。
    - 列出每个动作的用途、持续时间、关键姿势、方向、循环边界、层级变化和挂点要求。
    - 把连续动作拆成 `*_pre`、`*_loop`、`*_pst`，只有在运行时代码确实如此调用时才采用该命名。
@@ -38,6 +39,7 @@ description: Analyze, design, create, modify, and audit Spriter SCML animation a
 7. 制作部件与 pivot。
    - 需要新贴图时使用 `$dst-texture-style`，按关节、遮挡和 symbol 替换边界拆件。
    - 同一视觉部件的换帧保持语义 pivot 稳定；更换裁切框时补偿坐标。
+   - 静态地面物、建筑和落地 FX 的世界原点必须位于画面主体与地面的实际接触线；不得按画布底边、alpha 最低像素、投影边缘或视觉中心机械设置 pivot。阴影和透明余量可以延伸到原点下方。
    - 保留参考中必要的负缩放、非中心 pivot 和超界 pivot，不做无依据的“清理”。
 8. 组织时间轴。
    - 对照参考使用 `curve_type="instant"`、显式 mainline key、object_ref 和 z_index。
