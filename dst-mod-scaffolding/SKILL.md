@@ -36,7 +36,7 @@ GLOBAL.setmetatable(env, {
 ```
 
 - 不要同时声明互斥的 client_only_mod 与 all_clients_require_mod。
-- 不要在 modinfo.lua 执行游戏运行时逻辑。
+- 不要在 modinfo.lua 执行游戏运行时逻辑。modinfo 的沙箱环境没有 ipairs/pairs/table/string 等标准库，只能用数值 for、#t、直接下标赋值和字符串字面量方法调用；详见 references/entrypoints.md 的“modinfo 环境限制”。
 - 不要为未使用的资源、Prefab 或入口添加占位声明。
 - 保留已有用户文件和配置；扩展现有模组前先读取其结构。
 

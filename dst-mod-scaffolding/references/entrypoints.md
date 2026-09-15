@@ -11,6 +11,41 @@
 
 当前 mods.lua 不加载 modfrontendmain.lua。普通客户端运行时逻辑仍放在 modmain.lua。只创建实际需要的入口；modworldgenmain.lua 不能依赖 TheWorld 或玩家，modservercreationmain.lua 通常也没有运行中的世界。
 
+## modinfo 环境限制
+
+modinfo.lua 由 `ModIndex:InitializeModInfo`（modindex.lua，搜索 `InitializeModInfo`）用 `kleiloadlua` + `setfenv` 执行，环境是**没有任何元表的裸表**，只提供三个成员：
+
+- `folder_name`：模组文件夹名
+- `locale`：当前语言代码（如 zh/zhr/en）
+- `ChooseTranslationTable(tbl)`：按 locale 取翻译表
+
+因此标准库全部不可用：`ipairs`、`pairs`、`next`、`table.*`、`string.*`（作为全局库）、`math.*`、`tostring`、`tonumber`、`print`、`setmetatable`、`type`、`os.*`、`require` 等一律是 nil。调用会报 `attempt to call global 'ipairs' (a nil value)`。
+
+modinfo 里安全的构造（工作坊流行模组实际在用）：
+
+```lua
+-- 数值 for + # + 直接下标赋值（不用 ipairs/table.insert）
+for i = 1, #options do
+    configuration_options[#configuration_options + 1] = options[i]
+end
+
+-- 字符串值自带元表：方法调用和库函数都能用
+local s = "abc"
+local u = s:upper()          -- 可用
+local f = ("x%s"):format(1) -- 可用
+
+-- GP 的遮蔽技巧：让 string.char 这类库名也可用
+local string = ""
+local ch = string.char(65)  -- A：解析到局部字符串值，再走元表取库
+```
+
+注意事项：
+
+- modmain 的环境在设置 `__index → GLOBAL` 继承后标准库可用，该限制仅针对 modinfo；从 modmain 复制代码到 modinfo 时要改写。
+- 工作坊模组 modinfo 里的 `env.pairs`、`env.require` 等调用（如 Epic Healthbar 的 `SetLocaleMod(env)`）位于需要外部传入运行时环境的函数内，modinfo 加载时从不执行；不能当作 modinfo 沙箱可用的证据直接照抄。同理 `DoInit(locale, env)` 在文件尾部只传 locale，env 为 nil，其 `env.MergeMapsDeep` 分支同样不会走。
+- 需要按 locale 生成选项时（如 Epic Healthbar 的 DoInit(locale)），只能用上述安全构造实现。
+- 语言无关的辅助函数（拼接 description/data 表）是允许的；限制针对的是标准库，不是函数定义本身。
+
 ## 安装模型
 
 | 模型 | client_only_mod | all_clients_require_mod | 客户端安装含义 |
