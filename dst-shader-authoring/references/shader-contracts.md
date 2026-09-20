@@ -16,15 +16,17 @@
 
 在同一份 DST 安装中优先读取下列文件，而不是凭记忆补全引擎接口：
 
+下列 `shaders.zip!/shaders/...` 表示压缩包内的成员，不是可直接打开的磁盘路径。先只读检查 `data/databundles/shaders.zip`；需要检索内容时，将所需成员解压到任务工作目录。只有自行解包后才存在对应的 `shaders/` 目录，原始资源包保持只读。
+
 - `data/scripts/gamelogic.lua`：各 `RENDERPASS` 的默认 effect；bloom 默认是 `anim_bloom.ksh`。
-- `data/databundles/shaders/anim.ksh`：世界动画主 pass、图集、时间、颜色变换与光照。
-- `data/databundles/shaders/anim_bloom.ksh`：世界 `AnimState` bloom pass 的输入与默认输出。
-- `data/databundles/shaders/ui_anim.ksh`、`ui_anim_cc.ksh`：UI `UIAnim` 的 `AnimState` 主 pass。
-- `data/databundles/shaders/ui.ksh`：最小 UI `ImageWidget`。
-- `data/databundles/shaders/overheat.ksh`：`IMAGE_PARAMS` 与 UV 扭曲。
-- `data/databundles/shaders/moonstorm.ksh`：`IMAGE_PARAMS`、`IMAGE_PARAMS2` 和 `ALPHA_RANGE`。
-- `data/databundles/shaders/vfx_particle*.ksh`：不同 blend 家族的 GPU 粒子。
-- `data/databundles/shaders/postprocess_*.ksh`、`blurh.ksh`、`blurv.ksh`：全屏和多 pass。
+- `data/databundles/shaders.zip!/shaders/anim.ksh`：世界动画主 pass、图集、时间、颜色变换与光照。
+- `data/databundles/shaders.zip!/shaders/anim_bloom.ksh`：世界 `AnimState` bloom pass 的输入与默认输出。
+- `data/databundles/shaders.zip!/shaders/ui_anim.ksh`、同包的 `shaders/ui_anim_cc.ksh`：UI `UIAnim` 的 `AnimState` 主 pass。
+- `data/databundles/shaders.zip!/shaders/ui.ksh`：最小 UI `ImageWidget`。
+- `data/databundles/shaders.zip!/shaders/overheat.ksh`：`IMAGE_PARAMS` 与 UV 扭曲。
+- `data/databundles/shaders.zip!/shaders/moonstorm.ksh`：`IMAGE_PARAMS`、`IMAGE_PARAMS2` 和 `ALPHA_RANGE`。
+- `data/databundles/shaders.zip!/shaders/vfx_particle*.ksh`：不同 blend 家族的 GPU 粒子。
+- `data/databundles/shaders.zip!/shaders/postprocess_*.ksh`、同包的 `shaders/blurh.ksh`、`shaders/blurv.ksh`：全屏和多 pass。
 - `data/scripts/postprocesseffects.lua`：后处理构建、排序、sampler、uniform。
 - `data/scripts/widgets/image.lua`：UI 参数写入 API。
 - `data/scripts/prefabs/mistparticle.lua`：`VFXEffect` 资源绑定。

@@ -24,6 +24,8 @@ Replica 只向客户端提供动作发现、UI 或预测所需的最小只读接
 5. 服务器 Component 更新 Replica。
 6. 客户端收到实体初始复制标签后构造 Replica，并通过 inst.replica.name 读取。
 
+组件移除后 Replica 会保留并在重新添加组件时复用；Component 构造时应同步默认值，不能只依赖 Replica 构造初始化。
+
 将 netvar 的 dirty event 保留给客户端复制刷新。服务器需要发布带自定义 data 的领域事件时使用不同名称，例如网络事件 `mod_state_dirty` 对应服务器事件 `mod_state_changed`；不要让同名事件在主机与客户端具有不同参数契约。
 
 Prefab 直接创建的 inst._foo = net_* 应放在 SetPristine 前；Replica 自己的网络字段遵循上述 ReplicateComponent 生命周期，不要为了满足错误的统一顺序而在 Prefab 中重复创建。

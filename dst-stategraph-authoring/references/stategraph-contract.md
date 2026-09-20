@@ -10,7 +10,8 @@ State 负责短期、可中断的动作与动画时序。持久数值、阶段�
 - tags 描述当前能力，不是永久实体标签。
 - onenter 设置动画、移动、timeout 和 statemem。
 - timeline 在明确帧执行服务器副作用。
-- events 处理 animover、timeout、attacked 等。
+- events 处理 animover、attacked 等实体事件。
+- ontimeout 处理 inst.sg:SetTimeout 设置的计时到期；该计时不会发送 timeout 事件。
 - onexit 撤销进入时创建的临时状态。
 
 临时数据放 inst.sg.statemem。不要依赖 onexit 只在动画自然结束时调用。

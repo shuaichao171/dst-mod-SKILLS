@@ -37,7 +37,7 @@
 从 skill 目录使用以下命令复现该统计：
 
 ```powershell
-python scripts/analyze_scml.py <anim_unpacked>/zip --skip-image-checks
+python scripts/analyze_scml.py <anim_unpacked>/zip --mode baked --skip-image-checks
 ```
 
 ## 不要过度推断
@@ -52,11 +52,11 @@ python scripts/analyze_scml.py <anim_unpacked>/zip --skip-image-checks
 
 1. `folder/file` 定义 PNG 相对路径、像素尺寸和默认 pivot。
 2. `entity/animation` 定义动作名、`length` 和 `interval`。
-3. `mainline/key/object_ref` 在每个主帧选择 timeline、timeline key 和 z_index。
-4. `timeline/key/object` 选择 folder/file，并记录 x、y、scale、angle 与可选 pivot。
-5. folder、file、timeline 和 key ID 都以所属父节点为作用域，不把别处 ID 当作全局 ID。
+3. `mainline/key/object_ref` 在每个主帧选择图片 timeline、timeline key 和 z_index；`bone_ref` 指向骨骼 timeline。引用的 `parent` 指向同一 mainline key 中的 bone_ref，缺省或 `-1` 表示无父骨骼。
+4. 图片 `timeline/key/object` 选择 folder/file，并记录 x、y、scale、angle 与可选 pivot；`object_type="bone"` 的时间轴使用 `<bone>`，不需要图片引用。省略 object_type 时按 sprite 处理。
+5. folder、file、timeline 和 key ID 都以所属父节点为作用域；同一 mainline key 的 bone_ref 和 object_ref 分别检查 ID，不能把它们或其他节点的 ID 当成全局 ID。
 
-遵循当前语料的稳妥基线：
+匹配当前烘焙语料时采用以下基线；源工程无需为了这些采样特征而烘焙或删骨骼：
 
 - 使用 UTF-8 XML 和 `spriter_data scml_version="1.0"`。
 - 常规动作采用 33ms interval；只有明确匹配参考或运行时要求时改变。
@@ -130,21 +130,27 @@ Spriter pivot 通常以归一化贴图坐标记录：x 从左向右，y 从下�
 
 ## 验证
 
-运行：
+检查可编辑源工程（默认模式）：
 
 ```powershell
-python scripts/analyze_scml.py <target.scml>
+python scripts/analyze_scml.py <target.scml> --mode source
 ```
+
+对反编译参考或已经烘焙的编译投影使用 `--mode baked`。两种模式都检查图片存在性/尺寸、作用域内重复 ID、timeline/key 和 folder/file 断链、bone/sprite 类型错误、父骨骼目标与环；不支持的 object_type 会明确报告“本检查器未支持”，不会伪称源 SCML 非法。JSON 和 Markdown 都记录所选 mode，旧统计字段保留。
+
+`source` 支持 sprite/bone 时间轴，允许补间引用较早的 timeline key，也不把循环包裹时的较晚引用误当作断链；非即时插值和非 interval 网格关键帧仍保留统计，但不算校验失败。源工程省略 interval 时不执行网格检查；小数毫秒保留而不截断，显式无效 interval、负数或非有限时间仍被拒绝。`baked` 额外拒绝骨骼、非即时插值、非网格关键帧和非同时刻引用，沿用参考语料的严格检查。
+
+分析器不求解骨骼矩阵或补间曲线，不验证所有 SCML 扩展类型，也不执行 PNG 完整解码；它的通过只覆盖以上静态检查，不能代替实际编译、动画预览或游戏加载。SCML 引用结构可核对 [Spriter 官方格式参考](https://brashmonkey.com/ScmlDocs/ScmlReference.html) 的 mainline、timeline、bone_ref 和 object_ref。
 
 然后逐项确认：
 
 - XML 可解析，根节点版本正确，ID 在各自作用域内存在且不重复。
-- folder/file 与 timeline/key 引用存在，object_ref 指向同一时刻的 timeline key。
+- folder/file 与 timeline/key 引用存在且目标类型正确；父骨骼链闭合、无环。烘焙模式要求同时刻引用，源工程按补间结构保留较早的关键帧引用。
 - PNG 路径使用安全的正斜杠相对路径，不包含绝对路径或 `..` 越界。
 - PNG 存在且声明尺寸匹配；原版的 100x100 重建占位作为已知例外单独报告。
 - mainline 的稀疏槽位与终点边界是有意设计，不因“补齐帧”改变参考节奏。
 - 动作名、方向和 pre/loop/pst 契约与 Lua 一致。
-- 时间落在目标 interval 网格，关键游戏事件能对齐明确帧。
+- 烘焙产物时间落在目标 interval 网格；源工程可独立布置关键帧，编译后仍需验证关键游戏事件对齐。
 - 首帧继承正确，末帧能无跳变进入下一状态。
 - 循环首尾在位置、速度、遮挡和图形帧上闭合。
 - 镜像后握点、脸、文字性标记和不对称装备方向正确。

@@ -13,7 +13,7 @@ description: Create and tune Don't Starve Together creature brains and behaviour
 2. 在 Brain:OnStart 中构建 root，使用 PriorityNode 明确优先级；用 WhileNode 或 IfNode 包住状态条件。
 3. 优先复用 behaviours/ 中的 ChaseAndAttack、DoAction、Follow、RunAway、Leash、Wander 等节点。
 4. 目标搜索函数过滤死亡、不可见、无效、同阵营和超出领地对象，并使用适当 MUST、CANT、ONEOF 标签。
-5. 让节点返回 READY、RUNNING、SUCCESS 或 FAILED 的正确状态；等待时使用 Sleep，避免每 tick 全图扫描。
+5. 在节点 Visit 中设置 self.status 为 READY、RUNNING、SUCCESS 或 FAILED；调度器不读取 Visit 的 Lua 返回值。等待时使用 Sleep，避免每 tick 全图扫描。
 6. 只有现有节点无法表达时才创建自定义 BehaviourNode，并实现 Visit、Reset、Stop 与睡眠语义。
 7. 用 Brain 调试字符串和不同玩家距离测试苏醒、休眠、目标切换、失去目标及 SG 忙碌状态。
 
@@ -42,4 +42,3 @@ description: Create and tune Don't Starve Together creature brains and behaviour
 
 - 复制 assets/brain-template.lua 创建 Brain。
 - 需要节点选择和性能规则时读取 references/brain-patterns.md。
-

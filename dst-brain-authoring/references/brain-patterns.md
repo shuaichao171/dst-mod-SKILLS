@@ -35,5 +35,4 @@
 
 ## 自定义 Behaviour
 
-仅在 behaviours/ 无法表达需求时创建。实现 Visit、Reset、Stop 和睡眠；返回 READY、RUNNING、SUCCESS、FAILED 的正确状态，并确保中断时撤销任务和事件。
-
+仅在 behaviours/ 无法表达需求时创建。实现 Visit、Reset、Stop 和睡眠；在 Visit 中设置 self.status，调度器不读取其 Lua 返回值。例如持续运行时设置 self.status = RUNNING，并按需调用 self:Sleep(0.5)。确保中断时撤销任务和事件。

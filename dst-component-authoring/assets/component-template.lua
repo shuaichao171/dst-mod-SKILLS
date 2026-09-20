@@ -1,6 +1,11 @@
 local ModState = Class(function(self, inst)
     self.inst = inst
     self.enabled = false
+
+    -- Re-adding a component reuses its replica, which may still hold an old value.
+    if inst.replica ~= nil and inst.replica.mod_state ~= nil then
+        inst.replica.mod_state:SetEnabled(self.enabled)
+    end
 end)
 
 function ModState:SetEnabled(enabled)

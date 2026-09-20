@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import statistics
 import struct
 import sys
@@ -12,7 +13,10 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import Iterable
+from typing import Iterable, Literal
+
+
+AuditMode = Literal["source", "baked"]
 
 
 @dataclass
@@ -41,6 +45,8 @@ class FileReport:
     invalid_animation_timing: int = 0
     unkeyed_mainline_slots: int = 0
     mismatched_ref_times: int = 0
+    unsupported_timeline_types: int = 0
+    baked_constraint_violations: int = 0
     warnings: list[str] = field(default_factory=list)
 
     @property
@@ -96,7 +102,50 @@ def is_unsafe_image_path(name: str) -> bool:
     return posix_path.is_absolute() or windows_path.is_absolute() or ".." in posix_path.parts
 
 
-def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, object]]:
+def read_time(value: str | None, default: int = 0) -> int | float:
+    """Read finite nonnegative milliseconds without truncating fractional source keys."""
+    if value is None:
+        return default
+    parsed = float(value)
+    if not math.isfinite(parsed) or parsed < 0:
+        raise ValueError(f"SCML time must be finite and nonnegative: {value!r}")
+    return int(parsed) if parsed.is_integer() else parsed
+
+
+def is_on_grid(time: int | float, interval: int | float) -> bool:
+    slot = time / interval
+    return math.isclose(slot, round(slot), rel_tol=0.0, abs_tol=1e-9)
+
+
+def validate_parents(refs: list[ET.Element], bones: list[ET.Element], report: FileReport) -> None:
+    """Parents are bone_ref IDs in this mainline key, never timeline/object IDs."""
+    bone_map = {ref.get("id", ""): ref for ref in bones}
+    for ref in refs:
+        parent = ref.get("parent")
+        if parent not in (None, "-1") and parent not in bone_map:
+            report.broken_references += 1
+            report.warnings.append(
+                f"{ref.tag} {ref.get('id')}: parent {parent!r} is not a bone_ref in this mainline key"
+            )
+
+    # Follow parent links iteratively so deeply nested valid rigs need no recursion.
+    completed: set[str] = set()
+    for bone_id in bone_map:
+        chain: set[str] = set()
+        current: str | None = bone_id
+        while current in bone_map and current not in completed:
+            if current in chain:
+                report.broken_references += 1
+                report.warnings.append(f"bone_ref {current}: cyclic parent chain")
+                break
+            chain.add(current)
+            current = bone_map[current].get("parent")
+        completed.update(chain)
+
+
+def analyze_file(
+    path: Path, check_images: bool, mode: AuditMode = "source"
+) -> tuple[FileReport, dict[str, object]]:
     report = FileReport(path=str(path))
     root = ET.parse(path).getroot()
     if root.tag != "spriter_data" or root.get("scml_version") != "1.0":
@@ -143,8 +192,8 @@ def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, 
                         )
 
     animation_names: list[str] = []
-    intervals: list[int] = []
-    lengths: list[int] = []
+    intervals: list[int | float] = []
+    lengths: list[int | float] = []
     loop_values: Counter[str] = Counter()
     curve_types: Counter[str] = Counter()
 
@@ -156,16 +205,18 @@ def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, 
     for animation in root.findall("entity/animation"):
         report.animations += 1
         animation_names.append(animation.get("name", ""))
-        length = int(as_float(animation.get("length"), 0))
-        interval = int(as_float(animation.get("interval"), 0))
+        length = read_time(animation.get("length"))
+        interval = read_time(animation.get("interval"))
         lengths.append(length)
         intervals.append(interval)
         loop_values[animation.get("looping", "implicit")] += 1
-        if interval <= 0 or length < 0:
+        if interval <= 0 and (mode == "baked" or animation.get("interval") is not None):
             report.invalid_animation_timing += 1
-        if interval <= 0:
             report.warnings.append(f"{animation.get('name', '<unnamed>')}: interval <= 0")
-        elif length % interval not in (0, 1, interval - 1):
+        elif interval > 0 and not any(
+            is_on_grid(length + endpoint_offset, interval)
+            for endpoint_offset in (-1, 0, 1)
+        ):
             report.warnings.append(
                 f"{animation.get('name', '<unnamed>')}: length {length} is off the {interval} ms grid"
             )
@@ -173,71 +224,117 @@ def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, 
         timeline_elements = animation.findall("timeline")
         report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(timeline_elements)
         timelines = {timeline.get("id", ""): timeline for timeline in timeline_elements}
-        timeline_keys: dict[str, dict[str, int]] = {}
+        timeline_keys: dict[str, dict[str, int | float]] = {}
+        timeline_types = {
+            timeline_id: timeline.get("object_type", "sprite")
+            for timeline_id, timeline in timelines.items()
+        }
         for timeline_id, timeline in timelines.items():
+            object_type = timeline_types[timeline_id]
+            if object_type not in ("sprite", "bone"):
+                report.unsupported_timeline_types += 1
+                report.warnings.append(
+                    f"timeline {timeline_id}: object_type {object_type!r} is unsupported by "
+                    "this analyzer (supports sprite and bone); not a claim of invalid SCML"
+                )
+            elif mode == "baked" and object_type == "bone":
+                report.baked_constraint_violations += 1
+                report.warnings.append(
+                    f"timeline {timeline_id}: baked mode requires flattened sprite timelines; "
+                    "audit the editable rig with --mode source"
+                )
             keys = timeline.findall("key")
             report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(keys)
             timeline_keys[timeline_id] = {
-                key.get("id", ""): int(as_float(key.get("time"), 0)) for key in keys
+                key.get("id", ""): read_time(key.get("time")) for key in keys
             }
         mainline_keys = animation.findall("mainline/key")
         report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(mainline_keys)
         report.mainline_keys += len(mainline_keys)
-        mainline_times: set[int] = set()
+        mainline_times: set[int | float] = set()
         for key in mainline_keys:
-            key_time = int(as_float(key.get("time"), 0))
+            key_time = read_time(key.get("time"))
             mainline_times.add(key_time)
             if key_time > length:
                 report.broken_references += 1
-            if interval > 0 and key_time % interval != 0:
+            if interval > 0 and not is_on_grid(key_time, interval):
                 report.off_grid_keys += 1
             object_refs = key.findall("object_ref")
             bone_refs = key.findall("bone_ref")
             refs = [*object_refs, *bone_refs]
-            report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(refs)
+            report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(object_refs)
+            report.invalid_or_duplicate_ids += count_invalid_or_duplicate_ids(bone_refs)
             report.object_refs += len(object_refs)
             report.bone_refs += len(bone_refs)
+            validate_parents(refs, bone_refs, report)
             for ref in refs:
                 timeline_id = ref.get("timeline", "")
                 key_id = ref.get("key", "")
                 if timeline_id not in timeline_keys or key_id not in timeline_keys[timeline_id]:
                     report.broken_references += 1
-                elif timeline_keys[timeline_id][key_id] != key_time:
+                    report.warnings.append(
+                        f"{ref.tag} {ref.get('id')}: missing timeline/key {timeline_id}/{key_id}"
+                    )
+                    continue
+                expected_type = "bone" if ref.tag == "bone_ref" else "sprite"
+                actual_type = timeline_types[timeline_id]
+                if actual_type in ("sprite", "bone") and actual_type != expected_type:
+                    report.schema_mismatches += 1
+                    report.warnings.append(
+                        f"{ref.tag} {ref.get('id')}: references {actual_type} timeline {timeline_id}"
+                    )
+                if mode == "baked" and timeline_keys[timeline_id][key_id] != key_time:
                     report.mismatched_ref_times += 1
 
         if interval > 0 and length >= 0:
-            expected_times = set(range(0, length + 1, interval))
-            report.unkeyed_mainline_slots += len(expected_times - mainline_times)
+            occupied_slots = {
+                round(time / interval) for time in mainline_times
+                if time <= length and is_on_grid(time, interval)
+            }
+            last_slot = round(length / interval) if is_on_grid(length, interval) else math.floor(length / interval)
+            report.unkeyed_mainline_slots += last_slot + 1 - len(occupied_slots)
 
-        for key in animation.findall("timeline/key"):
-            report.timeline_keys += 1
-            key_time = int(as_float(key.get("time"), 0))
-            if key_time > length:
-                report.broken_references += 1
-            if interval > 0 and key_time % interval != 0:
-                report.off_grid_keys += 1
-            curve = key.get("curve_type", "linear")
-            curve_types[curve] += 1
-            if curve == "instant":
-                report.instant_keys += 1
-            else:
-                report.non_instant_keys += 1
-            obj = key.find("object")
-            if obj is None:
-                report.schema_mismatches += 1
-                continue
-            if (obj.get("folder", ""), obj.get("file", "")) not in image_map:
-                report.broken_references += 1
-            sx = as_float(obj.get("scale_x"), 1.0)
-            sy = as_float(obj.get("scale_y"), 1.0)
-            angle = as_float(obj.get("angle"), 0.0)
-            alpha = as_float(obj.get("a"), 1.0)
-            if sx < 0 or sy < 0:
-                report.negative_scale_objects += 1
-            if alpha != 1.0:
-                report.alpha_objects += 1
-            if sx != 1.0 or sy != 1.0 or angle != 0.0:
-                report.transformed_objects += 1
+        for timeline_id, timeline in timelines.items():
+            object_type = timeline_types[timeline_id]
+            for key in timeline.findall("key"):
+                report.timeline_keys += 1
+                key_time = read_time(key.get("time"))
+                if key_time > length:
+                    report.broken_references += 1
+                if interval > 0 and not is_on_grid(key_time, interval):
+                    report.off_grid_keys += 1
+                curve = key.get("curve_type", "linear")
+                curve_types[curve] += 1
+                if curve == "instant":
+                    report.instant_keys += 1
+                else:
+                    report.non_instant_keys += 1
+                if object_type not in ("sprite", "bone"):
+                    continue
+                payload_tag = "bone" if object_type == "bone" else "object"
+                payloads = [child for child in key if child.tag in ("bone", "object")]
+                if len(payloads) != 1 or payloads[0].tag != payload_tag:
+                    report.schema_mismatches += 1
+                    report.warnings.append(
+                        f"timeline {timeline_id} key {key.get('id')}: {object_type} requires "
+                        f"exactly one <{payload_tag}> payload"
+                    )
+                    continue
+                if object_type == "bone":
+                    continue
+                obj = payloads[0]
+                if (obj.get("folder", ""), obj.get("file", "")) not in image_map:
+                    report.broken_references += 1
+                sx = as_float(obj.get("scale_x"), 1.0)
+                sy = as_float(obj.get("scale_y"), 1.0)
+                angle = as_float(obj.get("angle"), 0.0)
+                alpha = as_float(obj.get("a"), 1.0)
+                if sx < 0 or sy < 0:
+                    report.negative_scale_objects += 1
+                if alpha != 1.0:
+                    report.alpha_objects += 1
+                if sx != 1.0 or sy != 1.0 or angle != 0.0:
+                    report.transformed_objects += 1
 
     if report.missing_images:
         report.warnings.append(f"{report.missing_images} referenced PNG files are missing or invalid")
@@ -255,6 +352,8 @@ def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, 
         ("invalid_animation_timing", "invalid animation timing declarations"),
         ("mismatched_ref_times", "object references with mismatched times"),
         ("non_instant_keys", "non-instant timeline keys"),
+        ("unsupported_timeline_types", "timeline types unsupported by this analyzer"),
+        ("baked_constraint_violations", "baked-profile violations (not SCML schema errors)"),
     ):
         count = getattr(report, field_name)
         if count:
@@ -273,16 +372,18 @@ def analyze_file(path: Path, check_images: bool) -> tuple[FileReport, dict[str, 
     return report, details
 
 
-def median(values: list[int]) -> float:
+def median(values: list[int | float]) -> float:
     return statistics.median(values) if values else 0.0
 
 
-def summarize(files: list[Path], check_images: bool) -> dict[str, object]:
+def summarize(
+    files: list[Path], check_images: bool, mode: AuditMode = "source"
+) -> dict[str, object]:
     reports: list[FileReport] = []
     errors: list[dict[str, str]] = []
     animation_names: Counter[str] = Counter()
-    intervals: Counter[int] = Counter()
-    lengths: list[int] = []
+    intervals: Counter[int | float] = Counter()
+    lengths: list[int | float] = []
     generators: Counter[str] = Counter()
     loop_values: Counter[str] = Counter()
     curve_types: Counter[str] = Counter()
@@ -290,7 +391,7 @@ def summarize(files: list[Path], check_images: bool) -> dict[str, object]:
 
     for path in files:
         try:
-            report, details = analyze_file(path, check_images)
+            report, details = analyze_file(path, check_images, mode)
         except (ET.ParseError, OSError, ValueError) as exc:
             errors.append({"path": str(path), "error": str(exc)})
             continue
@@ -329,6 +430,8 @@ def summarize(files: list[Path], check_images: bool) -> dict[str, object]:
             "invalid_animation_timing",
             "unkeyed_mainline_slots",
             "mismatched_ref_times",
+            "unsupported_timeline_types",
+            "baked_constraint_violations",
         )
     }
     totals["pivots_outside"] = pivots_outside
@@ -338,17 +441,20 @@ def summarize(files: list[Path], check_images: bool) -> dict[str, object]:
             "missing_images",
             "dimension_mismatches",
             "broken_references",
-            "off_grid_keys",
             "schema_mismatches",
             "unsafe_image_paths",
             "invalid_image_dimensions",
             "invalid_or_duplicate_ids",
             "invalid_animation_timing",
             "mismatched_ref_times",
-            "non_instant_keys",
+            "unsupported_timeline_types",
+            "baked_constraint_violations",
         )
     )
+    if mode == "baked":
+        totals["validation_issues"] += totals["off_grid_keys"] + totals["non_instant_keys"]
     return {
+        "mode": mode,
         "image_checks": check_images,
         "files_found": len(files),
         "files_parsed": len(reports),
@@ -374,6 +480,7 @@ def render_markdown(summary: dict[str, object]) -> str:
     lines = [
         "# SCML audit",
         "",
+        f"- Mode: {summary['mode']}",
         f"- Files: {summary['files_parsed']} parsed / {summary['files_found']} found",
         f"- Entities: {totals['entities']}",
         f"- Animations: {totals['animations']}",
@@ -393,6 +500,8 @@ def render_markdown(summary: dict[str, object]) -> str:
         f"- Invalid animation timing: {totals['invalid_animation_timing']}",
         f"- Unkeyed mainline grid slots: {totals['unkeyed_mainline_slots']}",
         f"- Ref/key time mismatches: {totals['mismatched_ref_times']}",
+        f"- Unsupported timeline types: {totals['unsupported_timeline_types']}",
+        f"- Baked-profile violations: {totals['baked_constraint_violations']}",
         f"- Validation issues: {totals['validation_issues']}",
         f"- Pivots outside 0..1: {totals['pivots_outside']}",
         f"- Median animation length: {summary['median_animation_length_ms']} ms",
@@ -435,6 +544,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("paths", nargs="+", type=Path, help="SCML files or directories")
     parser.add_argument("--json", action="store_true", help="emit JSON instead of Markdown")
     parser.add_argument(
+        "--mode", choices=("source", "baked"), default="source",
+        help="source: editable sprite/bone rigs (default); baked: flat instant keys on the interval grid",
+    )
+    parser.add_argument(
         "--skip-image-checks",
         action="store_true",
         help="skip PNG existence and dimension checks for faster corpus summaries",
@@ -448,7 +561,7 @@ def main() -> int:
     if not files:
         print("No SCML files found.", file=sys.stderr)
         return 2
-    summary = summarize(files, check_images=not args.skip_image_checks)
+    summary = summarize(files, check_images=not args.skip_image_checks, mode=args.mode)
     if args.json:
         print(json.dumps(summary, ensure_ascii=False, indent=2))
     else:

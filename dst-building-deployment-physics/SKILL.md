@@ -12,7 +12,7 @@ description: Create Don't Starve Together structures, deployable items, placers,
 1. 定义部署物、成品建筑、Placer、占地半径、合法地形、平台支持、碰撞层和拆除方式。
 2. 从同类建筑复制物理模式，使用 MakeObstaclePhysics、MakeInventoryPhysics 或专用标准函数。
 3. 用 MakePlacer 创建纯表现预览；旋转、偏移、网格吸附和动画与成品占地一致。
-4. deployable 的 candeployfn 与 ondeploy 在服务器重查位置、阻挡、地皮、船和资源消耗。
+4. 自定义部署检查使用 `inst._custom_candeploy_fn(inst, pt, mouseover, deployer, rot)`，在 SetPristine 前的主客机共有构造阶段设置；主机添加 deployable 后调用 `SetDeployMode(DEPLOYMODE.CUSTOM)`。客户端预览与服务器 CanDeploy 共用该判断，`deployable.ondeploy` 在检查通过后负责主机生成和资源消耗。使用 MakeDeployableKitItem 时传入 `deployable_data.custom_candeploy_fn` 与 `deployable_data.deploymode = DEPLOYMODE.CUSTOM`。
 5. 建筑添加 workable、burnable、propagator、lootdropper、hauntable 或 repairable，并为损坏/烧毁/拆除定义状态。
 6. SetPristine 前设置网络和客户端动画；主机分支保存建造者、耐久、升级和关联实体。
 7. 测试岸边、船、洞穴、阻挡边界、旋转、保存重载、燃烧中卸载和多人同时部署。
@@ -36,4 +36,3 @@ description: Create Don't Starve Together structures, deployable items, placers,
 - 客户端预览与服务器放置结果一致。
 - 所有摧毁路径正确掉落并清理关联实体和阻挡。
 - 多个玩家同时部署同一点不会重叠生成。
-

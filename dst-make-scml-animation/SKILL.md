@@ -23,9 +23,11 @@ description: Analyze, design, create, modify, and audit Spriter SCML animation a
    - 从技能目录运行：
 
      ```powershell
-     python scripts/analyze_scml.py <reference.scml> <target.scml>
+     python scripts/analyze_scml.py <target.scml> --mode source
+     python scripts/analyze_scml.py <baked-reference.scml> --mode baked
      ```
 
+   - 默认 `source` 检查可编辑的 sprite/bone 源工程：保留骨骼、补间和非采样网格关键帧；`baked` 才要求平铺图片时间轴、即时插值和 interval 网格。不要为了通过烘焙检查删除源骨骼；完整支持范围见参考的“验证”部分。
    - 对大语料先加 `--skip-image-checks`；交付目标必须启用 PNG 存在性和尺寸检查。
    - 已有可编辑的源 SCML 和 PNG 时，只修改源工程并用官方 Mod Tools 重新编译；不得把反编译 SCML 当作二次修改源。反编译仅用于参考，或核对最终包的 bank、build、动作、pivot、贴图和编译一致性。确实没有源工程且任务要求恢复资产时，明确记录重建依据和元数据损失风险。
 5. 写动作规格。
@@ -42,11 +44,11 @@ description: Analyze, design, create, modify, and audit Spriter SCML animation a
    - 静态地面物、建筑和落地 FX 的世界原点必须位于画面主体与地面的实际接触线；不得按画布底边、alpha 最低像素、投影边缘或视觉中心机械设置 pivot。阴影和透明余量可以延伸到原点下方。
    - 保留参考中必要的负缩放、非中心 pivot 和超界 pivot，不做无依据的“清理”。
 8. 组织时间轴。
-   - 对照参考使用 `curve_type="instant"`、显式 mainline key、object_ref 和 z_index。
+   - 源工程可使用 bone_ref 和补间；匹配烘焙参考时才使用 `curve_type="instant"`、逐帧 mainline key、object_ref 和 z_index。
    - 通过对象进入或退出 mainline 表达显隐；不要假设 alpha 动画会匹配现有导出链路。
-   - 逐帧检查 object_ref 的 timeline/key 指向、folder/file 指向和层级顺序。
+   - 检查 bone_ref/object_ref 的 timeline/key 指向、父骨骼链、图片 folder/file 指向和层级顺序。
 9. 验证并进游戏检查。
-   - 运行分析器，修复 XML、缺图、尺寸、节拍和引用问题。
+   - 按源工程或烘焙产物选择分析模式，修复 XML、缺图、尺寸和引用问题；源工程的非网格时间与补间统计不等同于格式错误。
    - 在动作前后状态、四方向、镜像、装备覆盖、骑乘或特殊形态中检查连接。
    - 检查首帧闪烁、末帧跳变、脚底滑动、穿层、pivot 抖动和循环停顿。
 
