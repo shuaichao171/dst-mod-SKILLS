@@ -21,46 +21,18 @@ D:\steam\steamapps\common\Don't Starve Together\data\scripts
 
 ## 接入方式：通过约定间接装载
 
-本项目目前**没有直接安装或注册到 Codex 的 Skill 目录**，因此不依赖 Codex 自动发现这些 Skill。实际使用的是一条由 `AGENTS.md` 驱动的约定式装载链：
+本项目**没有直接安装或注册到 Codex / Claude 的 Skill 目录**，不依赖自动发现，而是由工作流的 `AGENTS.md` 约定式装载。当前放在 alt_workflow 工作流的 `skills/dst-modding/mod-skills/` 下：
 
 ```text
 用户提出 DST 任务
     ↓
-Codex 读取全局 AGENTS.md
+代理读取全局 AGENTS.md → 工作流入口 alt_workflow/AGENTS.md
     ↓
-AGENTS.md 要求先读取 DST.md
+skills/INDEX.md 路由到 skills/dst-modding/SKILL.md
     ↓
-DST.md 指向本项目目录，并要求按任务选择最少数量的 Skill
+dst-modding/SKILL.md 指向本目录，并要求按任务选择最少数量的 Skill
     ↓
-Codex 完整读取所选目录的 SKILL.md 后再执行任务
-```
-
-当前机器使用以下两个约定文件：
-
-```text
-%USERPROFILE%\.codex\AGENTS.md
-%USERPROFILE%\.codex\AGENTS_MD\DST.md
-```
-
-其中 `%USERPROFILE%` 表示当前 Windows 用户目录，例如 `C:\Users\<用户名>`。
-
-全局 `AGENTS.md` 中负责转接到 DST 专项规则的内容是：
-
-```markdown
-## 专项规则
-
-- 制作《饥荒》相关内容前，必须先阅读并遵循 `%USERPROFILE%\.codex\AGENTS_MD\DST.md`。
-```
-
-`DST.md` 再通过以下约定把任务路由到本项目：
-
-```markdown
-## 模组开发
-
-- 编写《饥荒》模组前，必须根据具体内容选择并使用对应的技能。
-- 《饥荒》模组技能目录：`D:\steam\steamapps\common\Don't Starve Together\饥荒模组SKILLS`
-- 根据当前任务从目录中选择最少数量的相关 Skill；采取任务行动前，完整读取每个选中 Skill 的 `SKILL.md`。
-- 不要读取与当前任务无关的其他 Skill。后续任务的内容发生变化时，重新判断需要使用的 Skill。
+代理完整读取所选目录的 SKILL.md 后再执行任务
 ```
 
 这样配置后，用户只需正常描述 DST 开发需求，无需写 `$dst-...`：
@@ -71,7 +43,7 @@ Codex 完整读取所选目录的 SKILL.md 后再执行任务
 
 代理应根据约定自行判断并读取最少数量的相关 Skill，例如战斗、动作或网络专项，然后再研究源码和实施修改。这里的“最少数量”并非固定一个；任务确实跨系统时可以组合，但不能预先加载整个目录。
 
-如果项目移动到了其他位置，只需更新 `DST.md` 中的技能目录路径。若用于其他用户或机器，还应同步调整 `AGENTS.md` 中 `DST.md` 的绝对路径。
+上层引用均为相对路径，整个工作流移动位置后无需修改。单独使用本项目时，在自己的 `AGENTS.md` 中写明本目录位置和上述选择规则即可。
 
 ## 可选的显式指定
 
