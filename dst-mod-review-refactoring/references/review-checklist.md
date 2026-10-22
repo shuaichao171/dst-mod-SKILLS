@@ -19,7 +19,7 @@
 8. FindEntities、OnUpdate、网络和 FX 性能。
 9. UI 焦点、输入和 Kill。
 10. 资源路径、动画、Atlas 和字符串。
-11. Hook 组合、加载顺序和废弃 API。
+11. Hook 组合、加载顺序和废弃 API：AddPlayerPostInit / AddPrefabPostInitAny 用在玩家专属组件钩子就能满足的场景（每生成一个实体都要执行；确实依赖其时机的不算问题，见 dst-hooking-compatibility 的 references/post-init-hooks.md）；用 AddRecipePostInit 修改后加载的配方（不会触发）；AddVoteCommand（不会生效）；legacy 的 MOD_RPC 表。
 12. 专服、洞穴、重连和回滚。
 
 ## 单项发现格式

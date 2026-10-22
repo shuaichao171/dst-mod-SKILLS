@@ -19,6 +19,7 @@
 6. 每帧临时表、闭包和字符串。
 7. 高频 netvar set 与 RPC。
 8. 没有结束的 FX、子实体、任务和 Widget。
+9. AddPrefabPostInitAny / AddPlayerPostInit 回调：所有端每生成一个实体都要分配闭包并执行一次 xpcall，开销随注册数量增加。确认是否必须用这个时机，必须的话保证回调里先做最便宜的判断再提前返回。
 
 ## 优化手段
 

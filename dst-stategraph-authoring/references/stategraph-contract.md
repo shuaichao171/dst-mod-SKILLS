@@ -54,6 +54,38 @@ inst.Physics:Teleport(inst.Transform:GetWorldPosition())
 - 把 ActionHandler 放入 StateGraph 的第五个 actionhandlers 参数。EntityScript:PushBufferedAction 会调用 StateGraphInstance:StartAction；没有匹配处理器时，非 instant 动作会失败。
 - 不要用顶层 EventHandler('doaction', ...) 冒充 ActionHandler；PushBufferedAction 不发送该事件。
 
+## 向已有 SG 注入状态与事件
+
+`stategraph.lua` 的 `StateGraph` 构造函数按以下顺序合并 modmain 中的注册：
+
+1. 原版 actionhandlers，然后是 `AddStategraphActionHandler(sg, handler)`（断言 `is_a(ActionHandler)`）。
+2. 原版 events，然后是 `AddStategraphEvent(sg, EventHandler(...))`（断言 `is_a(EventHandler)`）。
+3. 原版 states，然后是 `AddStategraphState(sg, State{...})`（断言 `is_a(State)`）。
+4. 最后执行 `AddStategraphPostInit(sg, fn)`，参数是 StateGraph 对象本身。
+
+```lua
+-- modmain.lua：sg 参数是 StateGraph 的内部名称，不是文件名
+-- State、EventHandler 没有注入入口环境，未设置 GLOBAL 继承时写 GLOBAL.State
+AddStategraphState("wilson", State{ name = "mymod_cast", tags = { "busy", "doing" }, ... })
+AddStategraphState("wilson_client", State{ name = "mymod_cast", tags = { "busy", "doing" }, ... })
+AddStategraphEvent("wilson", EventHandler("mymod_stun", function(inst, data) ... end))
+
+-- 修改现有状态：在 PostInit 里包装，而不是用同名 State 整体替换
+AddStategraphPostInit("wilson", function(sg)
+    local state = sg.states.idle
+    local old_onenter = state.onenter
+    state.onenter = function(inst, ...)
+        old_onenter(inst, ...)
+        -- 追加逻辑
+    end
+end)
+```
+
+- 名称使用 `StateGraph("wilson", ...)` 的第一个参数：玩家是 `wilson` 与 `wilson_client`，生物看对应 SG 文件末尾的 `return StateGraph(...)`。
+- 按名称写入表，**同名会覆盖**：同名 State 或 EventHandler 会替换原版，多个模组注册同名时，按 enabledmods 顺序最后一个生效。新增内容一律加模组前缀；确实要替换时，写清冲突范围，或者改用 PostInit 包装。
+- 合并只在 SG 模块第一次被 `require` 时发生一次（各实体共享同一个 StateGraph 对象）。注册必须写在 modmain 顶层；不要在 modmain 里提前 `require("stategraphs/SGwilson")`，否则在你之后注册的模组可能不会生效。
+- 预测动作要在 `wilson` 和 `wilson_client` 里各添加一份对应状态，并保持 tags 一致，否则客户端会进不去状态或被服务器纠正。
+
 ## 对称清理
 
 进入时改变以下内容，退出时必须恢复：

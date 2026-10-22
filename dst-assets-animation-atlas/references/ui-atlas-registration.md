@@ -77,7 +77,7 @@ inst.MiniMapEntity:SetIcon("mymod_thing.tex")
 
 - `prefabs/minimap.lua` 在创建小地图时 `resolvefilepath` 并 `AddAtlas` 每个注册路径，所以必须在 modmain 加载时注册，进入世界后再注册不会生效。
 - `SetIcon` 的参数是 XML 里的元素名。原版 Minimap Atlas 元素用 `.png` 后缀（如 `chester.png`），模组工具链通常生成 `.tex` 后缀，以自己 XML 的实际名字为准。
-- 角色地图图标同样走这条路径（`<charname>.tex` 或对应元素名）。
+- 角色地图图标同样走这条路径，但 `player_common.lua` 固定调用 `SetIcon(name..".png")`，所以 XML 元素名必须是 `<charname>.png`，或者在 `common_postinit` 里改调 SetIcon。
 
 ## RegisterScrapbookIconAtlas
 

@@ -11,11 +11,12 @@ description: Create and maintain playable Don't Starve Together characters. Use 
 
 1. 定义角色规格：基础属性、优势、弱点、初始物品、专属动作、制作、技能树、语音、资源和存档状态。
 2. 对照 prefabs/player_common.lua 与至少一个机制相近的原版角色，使用玩家构造助手创建 Prefab。
-3. 在所有端初始化 AnimState、标签、网络变量、地图图标和客户端表现；在主机初始化组件数值、物品、监听和保存状态。
+3. 在所有端初始化 AnimState、标签、网络变量、地图图标和客户端表现；在主机初始化组件数值、物品、监听和保存状态。按 references/character-assets.md 的路径与元素名规则准备立绘、名字图、头像、制作栏头像、自检按钮、讣告图标和 `<name>.png` 地图图标。
 4. 只调用一次 AddModCharacter(name, gender, modes) 注册角色；显式传入 'FEMALE'、'MALE'、'ROBOT'、'NEUTRAL' 或 'PLURAL' 字符串之一，避免 nil 的警告和默认 'NEUTRAL'。补齐 STRINGS.CHARACTER_NAMES[name]、STRINGS.CHARACTER_DESCRIPTIONS[name]、STRINGS.CHARACTER_QUOTES[name] 与角色 speech 文件；只有实际提供皮肤时才添加相应 STRINGS.SKIN_NAMES 键。
 5. 优先向 SGwilson 和客户端 SG 添加状态、事件或 ActionHandler，不复制整份玩家 SG。
-6. 专属制作使用角色过滤器、builder_tag 或 builder_skill；技能树按 skilltree Skill 的数据和同步流程接入。
-7. 测试新建角色、重选角色、死亡复活、换洞穴、断线重连、保存重载、不同客户端资源和手柄 UI。
+6. 衣物不应覆盖的身体部件用 ExcludeClothingSymbolForModCharacter 排除；需要禁用原版角色时用 RemoveDefaultCharacter，并做成服务器配置项。
+7. 专属制作使用角色过滤器、builder_tag 或 builder_skill；技能树按 skilltree Skill 的数据和同步流程接入。
+8. 测试新建角色、重选角色、死亡复活、换洞穴、断线重连、保存重载、不同客户端资源和手柄 UI。
 
 ## 源码锚点
 
@@ -23,7 +24,8 @@ description: Create and maintain playable Don't Starve Together characters. Use 
 - 各原版角色 Prefab、speech_*.lua 和 skilltree_*.lua。
 - stategraphs/SGwilson.lua 与客户端玩家 SG。
 - widgets/、screens/redux/：角色选择、HUD 和技能树 UI。
-- modutil.lua：AddModCharacter、AddCharacterRecipe 与技能树图集注册。
+- modutil.lua：AddModCharacter、AddCharacterRecipe、ExcludeClothingSymbolForModCharacter、RemoveDefaultCharacter 与技能树图集注册。
+- characterutil.lua、recipes_filter.lua、widgets/targetindicator.lua、widgets/inventorybar.lua、screens/morguescreen.lua：角色 UI 资源路径。
 
 ## 不变量
 
@@ -37,3 +39,8 @@ description: Create and maintain playable Don't Starve Together characters. Use 
 - 角色在主机、专服客户端和洞穴中均能选择、生成和重连。
 - 死亡、复活、换人、保存重载后专属状态不重复或丢失。
 - 缺少可选皮肤、技能或配置时仍能使用基础角色。
+
+## 按需资源
+
+- 准备角色立绘、头像、名字图、地图图标，或使用衣物排除、移除原版角色时读取 references/character-assets.md。
+- 玩家初始化挂载点见 dst-hooking-compatibility 的 references/post-init-hooks.md。

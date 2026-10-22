@@ -14,7 +14,7 @@ description: Localize Don't Starve Together mods and author character speech. Us
 3. 默认字符串在运行入口初始化；大量翻译使用 PO 文件和 LoadPOFile，并明确语言代码。
 4. 角色 speech 文件沿原版 speech_* 结构覆盖需要的键，未覆盖项安全回退。
 5. 保留 %s、%d、换行、颜色标签和其他格式占位符的数量与顺序。
-6. 处理角色性别、复数、专有名词、文本过滤上下文和 UI 宽度。
+6. 处理角色性别、复数、专有名词、文本过滤上下文和 UI 宽度。加载提示文本通过 AddLoadingTip 写入 STRINGS.UI.LOADING_SCREEN_*_TIPS，id 加模组前缀；用法与权重见 dst-client-frontend-mods 的 references/frontend-assets-loadingtips.md。
 7. 测试默认语言、中文、缺失翻译、长文本、手柄 UI 和专服无 UI 环境。
 
 ## 源码锚点

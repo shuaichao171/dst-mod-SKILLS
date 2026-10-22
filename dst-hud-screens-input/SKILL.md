@@ -15,14 +15,16 @@ description: Integrate Don't Starve Together HUD elements, screens, popups, over
 4. 输入优先在目标 Widget 或 Screen 的 OnControl 处理；必须使用全局输入处理器时保存句柄并在关闭时移除。
 5. 打开 Screen 时设置默认焦点、返回路径、是否暂停和是否隐藏 HUD；关闭时恢复原状态。
 6. 玩家替换、死亡、重连和 HUD 重建时检测旧实例，避免重复注入。
-7. 测试键鼠、手柄、聊天框、地图、制作栏、暂停菜单和多个屏幕叠放。
+7. 斜杠命令、玩家菜单或服务器菜单项用 AddUserCommand；改变世界的逻辑放在 serverfn（服务器会重新检查权限），localfn 只做本地表现。投票用同一 API 的 vote 字段，不要用 AddVoteCommand（读取它的函数在当前脚本里没有调用者）。
+8. 测试键鼠、手柄、聊天框、地图、制作栏、暂停菜单和多个屏幕叠放。
 
 ## 源码锚点
 
 - screens/playerhud.lua、widgets/screen.lua、screens/popupdialog.lua。
 - widgets/controls.lua、widgets/badge.lua、widgets/overlay 类文件。
 - input.lua、frontend.lua。
-- modutil.lua：AddClassPostConstruct、AddPopup、SetModHUDFocus。
+- modutil.lua：AddClassPostConstruct、AddPopup、SetModHUDFocus、AddUserCommand。
+- usercommands.lua、builtinusercommands.lua、networking.lua 的 Networking_SlashCmd。
 
 ## 不变量
 
@@ -36,3 +38,7 @@ description: Integrate Don't Starve Together HUD elements, screens, popups, over
 - 打开关闭、死亡重建和断线重连后只有一个 UI 实例。
 - 聊天、制作、地图和暂停界面仍能正常获得焦点。
 - 远端客户端界面不访问主机专属数据。
+
+## 按需资源
+
+- 添加斜杠命令、菜单命令或投票命令时读取 references/user-commands.md。

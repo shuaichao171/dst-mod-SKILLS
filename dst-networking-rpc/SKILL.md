@@ -14,7 +14,7 @@ description: Implement and debug Don't Starve Together multiplayer replication a
 3. SetPristine 后让非主机分支返回，仅在主机添加 Component、保存逻辑和权威状态机。已注册为可复制的 Component 会在 AddComponent 内先触发 ReplicateComponent，其 Replica 构造函数可以在此时创建自己的 netvar。
 4. 选择最小 net 类型；状态用 netvar，瞬时通知才使用 net_event，并在 dirty 回调中只更新表现或缓存。
 5. 客户端需要组件式接口时创建 Replica，并在相关实体实例化前从 modmain.lua 调用 AddReplicableComponent；保持 Replica 方法对缺失数据返回安全值。
-6. 按方向选择 AddModRPCHandler、AddClientModRPCHandler 或 AddShardModRPCHandler；在接收端重新校验玩家、实体、距离、权限、冷却和参数范围。
+6. 按方向选择 AddModRPCHandler、AddClientModRPCHandler 或 AddShardModRPCHandler，并在所有端注册；发送时用 GetModRPC、GetClientModRPC 或 GetShardModRPC 取得 id_table，不再使用 legacy 的 MOD_RPC 表；在接收端重新校验玩家、实体、距离、权限、冷却和参数范围。
 7. 预测与非预测客户端必须汇合到同一服务端动作入口；`preview_cb` 不要绕过服务端 locomotor 直接执行依赖距离的最终逻辑。预测动作必须可由服务器结果纠正；分别测试主机玩家、远端客户端、专服和洞穴分片。
 
 ## 源码锚点
@@ -42,4 +42,4 @@ description: Implement and debug Don't Starve Together multiplayer replication a
 
 ## 按需资源
 
-- 需要方向、权威、实体参数与 Replica 选择时读取 references/network-contract.md。
+- 需要方向、权威、实体参数、Replica 选择、RPC 获取函数与发送目标时读取 references/network-contract.md。

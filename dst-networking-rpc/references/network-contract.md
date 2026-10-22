@@ -25,6 +25,26 @@
 
 Replica 的网络字段不等同于 Prefab 直接网络字段。服务器可在 SetPristine 后由 AddComponent 构造 Replica；客户端在实体初始标签反序列化后由 ReplicateEntity 构造对应 Replica。必须在相关实体出现前调用 AddReplicableComponent，使两端都知道该组件可复制。
 
+## RPC 注册与获取
+
+```lua
+-- modmain.lua 顶层：主机、客户端、各分片都必须执行同样的注册，ID 才能对上
+AddModRPCHandler("mymod", "accept", function(player, target) ... end)          -- 客户端 → 服务器，首参 player
+AddClientModRPCHandler("mymod", "invite", function(inviter) ... end)            -- 服务器 → 客户端，无 player 参数
+AddShardModRPCHandler("mymod", "sync", function(shardid, payload) ... end)      -- 分片 → 分片，首参发送方 shardid
+
+SendModRPCToServer(GetModRPC("mymod", "accept"), target)
+SendModRPCToClient(GetClientModRPC("mymod", "invite"), userid_or_list_or_nil, inviter)
+SendModRPCToShard(GetShardModRPC("mymod", "sync"), shardid_or_list_or_nil, payload)
+```
+
+- `GetModRPC` / `GetClientModRPC` / `GetShardModRPC(namespace, name)` 返回 `{ namespace, id }` 表，是发送接口要求的 `id_table`。modutil.lua 把 `MOD_RPC`、`CLIENT_MOD_RPC`、`SHARD_MOD_RPC` 全局表标为 legacy，新代码用 Get 函数。
+- 这三个函数直接索引 `MOD_RPC[namespace][name]`，namespace 未注册时会因为对 nil 取下标而报错。发送方和接收方都要先执行对应的 `Add*ModRPCHandler`。
+- `GetModRPCHandler` / `GetClientModRPCHandler` / `GetShardModRPCHandler(namespace, name)` 返回已注册的处理函数本身。用于包装或复用其他模组的处理器（先保存旧函数再转发），不能用来发送。
+- 发送目标：Client RPC 的第一个附加参数为 `nil` 时发给所有已连接客户端，也可以是单个 userid 或 userid 列表，只能发给本分片上的玩家；Shard RPC 同理，可以是 `nil`、单个 shardid 或列表。分片处理器收到的 shardid 是整数，需要时用 `tostring` 转回字符串（原版 `ShardTransactionSteps` 就是这样做的）。
+- 发送前 `Send*` 会断言处理器已注册。重置世界时 `DisableRPCSending` 会把发送函数替换为空函数，这期间发送不会报错，但也不会送达。
+- 服务器收到的 RPC 先进入队列，并按发送者限流：基础额度是 `RPC_QUEUE_RATE_LIMIT`（每个逻辑 tick 20 个），每注册一个 mod RPC 加 5。超出额度的请求会被丢弃，每个发送者只记一次日志。不要用高频 RPC 传输连续状态。
+
 ## RPC 校验
 
 ### 实体参数
@@ -35,13 +55,13 @@ RPC 需要传递接收端可见的网络实体时，直接传 Entity。DST 的 R
 
 ```lua
 -- 服务端通知指定客户端
-SendModRPCToClient(CLIENT_MOD_RPC.example.invite, invitee.userid, inviter)
+SendModRPCToClient(GetClientModRPC("example", "invite"), invitee.userid, inviter)
 
 AddClientModRPCHandler("example", "invite", function(inviter)
     if inviter == nil or not inviter:IsValid() then
         return
     end
-    SendModRPCToServer(MOD_RPC.example.accept, inviter)
+    SendModRPCToServer(GetModRPC("example", "accept"), inviter)
 end)
 
 -- 客户端请求服务端；处理器首参 player 是实际请求者
@@ -57,7 +77,7 @@ end)
 
 ```lua
 -- 错误：服务端 GUID 不能交给客户端的 Ents 查找，反向同理
-SendModRPCToClient(CLIENT_MOD_RPC.example.invite, invitee.userid, inviter.GUID)
+SendModRPCToClient(GetClientModRPC("example", "invite"), invitee.userid, inviter.GUID)
 AddClientModRPCHandler("example", "invite", function(inviter_guid)
     local inviter = Ents[inviter_guid]
 end)

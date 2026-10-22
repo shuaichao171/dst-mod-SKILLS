@@ -15,7 +15,7 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 4. 为非 instant BufferedAction 提供 ActionHandler。PushBufferedAction 调用 StartAction 查找 actionhandlers，普通 doaction EventHandler 不能替代它。
 5. onenter 验证参数与组件并启动动作；TimeEvent 使用 FRAMES 或明确秒数，权威副作用只在服务器 SG 的单一时间点执行。
 6. 为动画结束、timeout、attacked、death 和动作取消提供明确转移；onexit 对称撤销物理、控制、视觉、任务、声音和临时标签。
-7. 修改玩家动作时同时检查 SGwilson 与客户端 SG，验证预测、回正和 ServerStateMatches。
+7. 修改玩家动作时同时检查 SGwilson 与客户端 SG，验证预测、回正和 ServerStateMatches。向已有 SG 注入内容用 AddStategraphState、AddStategraphEvent、AddStategraphActionHandler，参数为 SG 内部名（如 wilson、wilson_client）；修改原版状态用 AddStategraphPostInit 包装 onenter/onexit，不要用同名 State 整体替换。
 8. 玩家状态临时穿过其他角色时，直接复用 SGwilson 同类状态的 Physics 碰撞掩码模式；不要用 ToggleOnCharacterCollisions 或 ToggleOffCharacterCollisions 代替。
 
 ## 源码锚点
@@ -41,4 +41,4 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 ## 按需资源
 
 - 复制 assets/stategraph-template.lua 创建独立 SG。
-- 需要状态契约、玩家预测或玩家碰撞处理时读取 references/stategraph-contract.md。
+- 需要状态契约、玩家预测、玩家碰撞处理或向已有 SG 注入状态/事件时读取 references/stategraph-contract.md。
