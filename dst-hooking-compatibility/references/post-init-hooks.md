@@ -148,3 +148,9 @@ end
 - `AddClassPostConstruct` 的回调是 `fn(self, ...)`，构造参数会原样传进来。需要用构造参数时，按原类构造函数的签名命名，后面仍然要带 `...`。
 - 不要依赖 Lua 5.0 风格的隐式 `arg` 表（虽然 DST 的 Lua 5.1 仍兼容），统一用 `...`；`arg` 遇到 nil 会截断，也会额外分配一张表。
 
+## 修改 TUNING
+
+- `tuning.lua` 在 `main.lua` 加载模组之前已经执行 `Tune()`，所以 modmain 顶层写 `TUNING.X = ...` 是在默认值之上修改。
+- **世界设置会在进世界时覆盖部分 TUNING 键**：`gamelogic.lua` 加载世界时，会按 `savedata.map.topology.overrides` 执行 `worldsettings_overrides.lua` 的 Pre/Post 函数，函数里通过 `OverrideTuningVariables` 直接改写 TUNING，原值存进 `ORIGINAL_TUNING`。所以如果你改的键也受某个世界设置控制，而玩家选了非默认值（个别设置连 default 也会写入），modmain 的修改会被覆盖。修改前先在 worldsettings_overrides.lua 里搜一下这个键名。
+- **缓存问题**：很多 Prefab 和组件文件会在文件顶部写 `local X = TUNING.Y`，在第一次被 require 或加载时就把值固定下来。Prefab 文件在进入世界时才加载，晚于 modmain，所以通常没问题。但如果目标文件在 modmain 执行前就已经被 require（例如 `main.lua` 在加载模组之前就 require 的 recipes、tuning 等依赖链），modmain 再改 TUNING 就不会生效。改之前先确认目标文件读取的是 TUNING 本身，还是文件顶部缓存的局部变量。
+- 只想影响自己的内容时，不要改共享的 TUNING 键，在自己的 Prefab 或组件里使用自己的常量。

@@ -41,4 +41,4 @@ description: Create and integrate custom Don't Starve Together actions. Use when
 ## 按需资源
 
 - 复制 assets/action-template.lua 创建动作注册文件，并从 modmain.lua 用 modimport 执行；该模板依赖模组环境中的 AddAction 与 AddComponentAction，不能作为普通 require 返回值模块使用。模板中的 `mod_interactable` 是占位组件名，必须替换为模组已有的服务器 Component 与客户端 Replica，或先用 `$dst-component-authoring` 实现两者。
-- 需要完整链路时读取 references/action-pipeline.md。
+- 需要完整链路、各收集类型的回调签名或 Action 构造字段时读取 references/action-pipeline.md。

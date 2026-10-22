@@ -13,7 +13,7 @@ description: Build Don't Starve Together inventory items, equipment, stacks, dur
 2. 在 SetPristine 前建立库存图标、标签和客户端所需网络状态；主机分支添加 inventoryitem 等组件。
 3. 配置 stackable、finiteuses、fueled、perishable、weapon、armor 或 tool，并明确耗尽、熄灭、腐败和破损回调。
 4. equippable 的 onequip 与 onunequip 对称处理 SymbolOverride、速度、伤害、防护、标签和跟随 FX。
-5. 容器同时配置 containers.lua 的 widgetsetup、槽位、过滤规则、open/close 回调和 container_replica 可见性。
+5. 容器同时配置 containers.lua 的 widgetsetup、槽位、过滤规则、open/close 回调和 container_replica 可见性：在所有端执行 `containers.params.<名字> = ...` 注册；槽位多于原版最大值时同步更新 `containers.MAXITEMSLOTS`；params 键与 Prefab 名不同时，客户端要自己调用 `replica.container:WidgetSetup`；`itemtestfn` 在两端都会执行。
 6. 处理进入库存、掉落、转移容器、角色死亡、堆叠合并、皮肤 Build 和实体移除。
 7. 测试鼠标与手柄、远端客户端、满容器、不可接受物品和保存重载。
 
@@ -37,3 +37,6 @@ description: Build Don't Starve Together inventory items, equipment, stacks, dur
 - 耐久、燃料和腐败只结算一次。
 - 远端客户端的槽位、图标、可用动作和服务器状态一致。
 
+## 按需资源
+
+- 注册模组容器、自定义槽位布局或过滤规则时读取 references/containers.md。

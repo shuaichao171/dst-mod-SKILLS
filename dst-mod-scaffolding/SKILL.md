@@ -11,7 +11,7 @@ description: Create and organize Don't Starve Together mod skeletons. Use when s
 
 1. 确认目标是客户端可不安装的服务器模组、所有客户端必装模组、纯客户端模组、世界生成模组还是建服前端扩展。
 2. 从 assets/minimal-mod/ 复制最小模板，只创建任务真正需要的入口和目录。
-3. 填写 modinfo.lua 的名称、描述、作者、版本、api_version、dst_compatible、客户端/服务器标志和 configuration_options。
+3. 填写 modinfo.lua 的名称、描述、作者、版本、api_version、dst_compatible、客户端/服务器标志和 configuration_options；需要控制加载顺序、依赖或图标时设置 priority、mod_dependencies、icon_atlas/icon（见 references/entrypoints.md）。
 4. 在 modmain.lua 顶部设置模组环境继承，再声明 PrefabFiles、Assets、配置读取与普通运行时钩子；把世界生成注册放入 modworldgenmain.lua，把建服界面注册放入 modservercreationmain.lua。
 5. 用 require 加载返回值模块；用 modimport 执行依赖 AddAction、PostInit 等模组环境 API 的注册文件。require 模块直接使用游戏全局，modimport 文件才沿用入口的模组环境。
 6. 验证资源路径、Prefab 名称、配置数据类型、依赖关系和服务器过滤标记。

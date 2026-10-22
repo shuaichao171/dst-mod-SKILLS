@@ -41,4 +41,4 @@ description: Create and modify Don't Starve Together prefab entities. Use when w
 ## 按需资源
 
 - 复制 assets/prefab-template.lua 作为网络 Prefab 起点。
-- 需要构造顺序和范例选择时读取 references/prefab-contract.md。
+- 需要构造顺序、范例选择，或 standardcomponents 装配函数应放在 SetPristine 前还是主机分支时读取 references/prefab-contract.md。

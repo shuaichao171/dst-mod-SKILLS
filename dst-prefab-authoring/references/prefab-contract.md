@@ -38,3 +38,19 @@ Entity:AddAnimState、AddPhysics、AddLight、AddFollower、AddVFXEffect 等可�
 - 装备和卸下
 - 燃烧、冻结、工作和死亡
 - 子实体、任务、事件与循环声音清理
+
+## standardcomponents.lua 常用装配函数的位置
+
+原版 Prefab 的固定写法：物理和带 `Pristine` 后缀的函数放在 SetPristine **之前**（所有端），其余放在主机分支。
+
+| 函数 | 位置 | 说明 |
+| --- | --- | --- |
+| `MakeInventoryPhysics`、`MakeCharacterPhysics`、`MakeObstaclePhysics`、`MakeSmallObstaclePhysics`、`MakeFlyingCharacterPhysics`、`MakeGhostPhysics` 等 | SetPristine 前 | 物理需要在所有端存在 |
+| `MakeInventoryFloatable(inst, size, offset, scale, swap_bank, float_index, swap_data)` | SetPristine 前 | 添加 `floater` 组件，负责水面漂浮表现（参见 axe.lua、log.lua） |
+| `MakeSnowCoveredPristine`、`MakeSmallPerishableCreaturePristine`、`MakeFeedableSmallLivestockPristine`、`MakeDeployableFertilizerPristine` | SetPristine 前 | 名字带 `Pristine` 的是公共部分 |
+| `MakeSnowCovered`、`MakeSmallPerishableCreature`、`MakeFeedableSmallLivestock` | 主机分支 | 对应 Pristine 版本的主机部分（`MakeSnowCovered` 也会自动补上 Pristine 部分） |
+| `MakeSmall/Medium/LargeBurnable`、`MakeSmall/Medium/LargePropagator`、`Make*BurnableCharacter` | 主机分支 | 燃烧与火焰传播 |
+| `Make*FreezableCharacter` | 主机分支 | 冰冻 |
+| `MakeHauntable`、`MakeHauntableLaunch`、`MakeHauntableLaunchAndIgnite`、`MakeHauntableWork`、`MakeHauntablePerish` 等 | 主机分支 | 鬼魂作祟反应；可作祟物品几乎都会调用其中一个 |
+
+用到时到 standardcomponents.lua 查看具体实现和参数，不要凭名字猜默认值。

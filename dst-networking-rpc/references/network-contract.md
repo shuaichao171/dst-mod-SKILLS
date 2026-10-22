@@ -25,6 +25,30 @@
 
 Replica 的网络字段不等同于 Prefab 直接网络字段。服务器可在 SetPristine 后由 AddComponent 构造 Replica；客户端在实体初始标签反序列化后由 ReplicateEntity 构造对应 Replica。必须在相关实体出现前调用 AddReplicableComponent，使两端都知道该组件可复制。
 
+## netvar 类型（netvars.lua）
+
+| 类型 | 取值 |
+| --- | --- |
+| `net_bool` | 1 bit |
+| `net_tinybyte` / `net_smallbyte` / `net_byte` | 0..7 / 0..63 / 0..255 |
+| `net_shortint` / `net_ushortint` | -32767..32767 / 0..65535 |
+| `net_int` / `net_uint` | 32 位有符号 / 无符号 |
+| `net_float` | 32 位浮点 |
+| `net_hash` | 设置时传字符串或 hash，读取时只返回 hash |
+| `net_string` | 变长字符串 |
+| `net_entity` | 实体引用 |
+| `net_bytearray` / `net_smallbytearray` / `net_ushortarray` | 数组，最多 31 个元素，开销大 |
+
+- 构造函数是 `net_xxx(inst.GUID, "唯一名", "dirty事件名")`。**服务器和客户端必须以相同的名字和类型声明同一组 netvar**，否则实体反序列化会失败。所以用了 netvar 的模组，服务器和所有客户端都必须安装。
+- `set(x)` 只在值真正改变时同步，并在两端触发 dirty 事件。`set_local(x)` 只改本地值、不同步，下一次服务器 `set` 无论值是否变化都会当作 dirty。dirty 事件在 Lua 更新之前触发。
+- 只有一个值会变化时，用 `GetIdealUnsignedNetVarForCount(count)` 选择能容纳它的最小无符号类型。
+- `net_event(guid, name)` 是对 net_bool 的封装，用 `:push()` 触发，只适合一次性信号。
+
+## 客户端复制钩子
+
+- 客户端反序列化实体后执行 `EntityScript:ReplicateEntity()`：对每个已注册的可复制组件，如果实体带有 `_<组件名>` 或 `__<组件名>` 标签，就构造对应的 Replica。服务器 AddComponent 时也正是通过这个标签告诉客户端要创建 Replica。所以不要手动移除 `_<组件名>` 标签。
+- Replica 构造完后会调用 `inst.OnEntityReplicated(inst)`（只要定义了这个字段）。客户端需要依赖 Replica 的初始化（例如 `inst.replica.container:WidgetSetup(...)`）放在这里，并且在 SetPristine 之后的客户端分支里赋值。
+
 ## RPC 注册与获取
 
 ```lua

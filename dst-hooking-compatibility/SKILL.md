@@ -14,7 +14,7 @@ description: Extend Don't Starve Together code through supported hooks and compa
 3. 读取 modutil.lua 中对应钩子的调用顺序、参数和作用域，再检查目标原版实现。
 4. 只修改所需字段或方法；包装函数时保存旧函数。包装函数的签名必须写成 `function(self, 用到的参数, ...)`，调用写成 `return old_fn(self, 用到的参数, ...)`，把可变参数和多个返回值原样转发。不能只写当前已知的固定参数，因为游戏更新常在末尾追加参数，其他模组也可能传入额外参数。
 5. 为重复加载或多个 Prefab 实例添加幂等标记，但不要在共享类表上误用实例标记。
-6. 对可选组件、其他模组字段和版本差异做 nil 检查与特性检测。
+6. 对可选组件、其他模组字段和版本差异做 nil 检查与特性检测。修改 TUNING 前确认该键不受世界设置覆盖，目标文件也没有在 modmain 之前缓存它。
 7. UI、事件和任务钩子记录清理路径；实体或 Widget 移除时解除监听。
 8. 使用至少两个加载顺序测试本模组与可能冲突的模组。
 
@@ -42,4 +42,4 @@ description: Extend Don't Starve Together code through supported hooks and compa
 
 ## 按需资源
 
-- 需要全局 PostInit 时机、玩家初始化挂载点、GlobalClassPostConstruct 用法，或包装函数的 `...` 写法与返回值处理时，读取 references/post-init-hooks.md。
+- 需要全局 PostInit 时机、玩家初始化挂载点、GlobalClassPostConstruct 用法，包装函数的 `...` 写法与返回值处理，或修改 TUNING（世界设置覆盖、文件顶部缓存）时，读取 references/post-init-hooks.md。

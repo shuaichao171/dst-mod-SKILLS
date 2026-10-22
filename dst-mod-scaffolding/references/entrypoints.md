@@ -56,6 +56,16 @@ local ch = string.char(65)  -- A：解析到局部字符串值，再走元表取
 
 当前 Lua 加载器不识别 server_only_mod。client_only_mod 与 all_clients_require_mod 互斥；两者均为 false 只表示不强制客户端安装，并不能让依赖客户端 Prefab、资源、RPC 或 UI 的内容自动兼容。
 
+## 其他常用 modinfo 字段
+
+| 字段 | 作用（modindex.lua / mods.lua） |
+| --- | --- |
+| `priority` | 加载顺序：数值大的先加载，相同时按 `name` 排序；字符串会用 `tonumber` 转换，失败按 0 处理。需要在另一个模组之后执行（例如修改它的配方）时，把本模组的值设得更低 |
+| `mod_dependencies` | 依赖列表，每项是一张表，例如 `{ workshop = "workshop-123456", ["ModFancyName"] = true }`：`workshop` 写创意工坊 id，其余键是模组名（值为 true 表示显示名，false 表示文件夹名）。找不到依赖时，本模组会被禁用。**`client_only_mod` 不支持依赖** |
+| `icon_atlas` / `icon` | 模组列表图标，路径相对于模组目录。文件不存在时会打印警告并清空这两个字段 |
+| `api_version` | 必须等于当前 `MOD_API_VERSION`（现在是 10）：更低会被标记为旧 API，更高直接加载失败。`api_version_dst` 存在时会覆盖它 |
+| `server_filter_tags` | 服务器浏览器的筛选标签 |
+
 ## 配置
 
 configuration_options 的 name 是稳定键。选项 data 类型应与 GetModConfigData 的消费逻辑一致。修改或删除已发布键时，为旧配置值提供回退。
