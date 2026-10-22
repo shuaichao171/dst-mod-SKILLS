@@ -5,8 +5,11 @@
 | 世界动画 | 编译后的 anim zip | Asset ANIM、AnimState |
 | UI 动画 | anim zip | UIAnim 的 AnimState |
 | UI 图片 | atlas xml 与 tex | Asset ATLAS、Asset IMAGE、Image |
-| 库存图标 | inventory atlas | inventoryitem、Recipe、注册 Atlas |
-| Minimap 图标 | minimap atlas | MiniMapEntity |
+| 库存图标 | inventory atlas | RegisterInventoryItemAtlas 或 inventoryitem.atlasname、Recipe、Ingredient |
+| Minimap 图标 | minimap atlas | AddMinimapAtlas、MiniMapEntity:SetIcon |
+| 图鉴、技能树图标 | scrapbook / skilltree atlas | RegisterScrapbookIconAtlas、RegisterSkilltreeIconsAtlas、RegisterSkilltreeBGForCharacter |
+
+UI 图集注册的键名、缓存和时机陷阱见 ui-atlas-registration.md。
 | Shader | ksh | dst-shader-authoring |
 
 ## 名称层级

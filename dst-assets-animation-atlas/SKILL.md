@@ -14,13 +14,14 @@ description: Prepare and integrate Don't Starve Together animation, build, bank,
 3. 用 DST Mod Tools 编译 SCML、纹理和图集，保留可再生成的源文件，不手工伪造二进制产物。
 4. 在 Prefab 或入口的 Assets 中声明实际使用资源；图集 XML、TEX 和 Lua 路径大小写保持一致。
 5. 设置 AnimState bank/build/animation 前确认名称存在；OverrideSymbol 与 ClearOverrideSymbol 成对管理。
-6. 库存、配方、角色肖像和 Minimap 图标分别注册正确 Atlas，不用世界动画资源替代 UI 图集。
+6. 库存、配方、角色肖像和 Minimap 图标分别注册正确 Atlas，不用世界动画资源替代 UI 图集：库存图标在 modmain 顶层用 RegisterInventoryItemAtlas(atlas, "<img>.tex")，Minimap 用 AddMinimapAtlas，图鉴与技能树用 RegisterScrapbookIconAtlas、RegisterSkilltreeIconsAtlas、RegisterSkilltreeBGForCharacter。
 7. 在干净启动中检查资源加载日志、所有动画状态、皮肤或 Build 切换和远端客户端。
 
 ## 源码锚点
 
 - prefabs/ 中 Asset、SetBank、SetBuild、PlayAnimation 和 OverrideSymbol 调用。
 - prefabs.lua、prefabutil.lua、modutil.lua 的资源注册 API。
+- simutil.lua：RegisterInventoryItemAtlas、GetInventoryItemAtlas 及图鉴、技能树、Minimap 的 Atlas 查找表。
 - widgets/image.lua、uianim.lua、itemimage.lua。
 - anim 与 atlas 相关 Mod Tools 输出约定。
 
@@ -40,4 +41,5 @@ description: Prepare and integrate Don't Starve Together animation, build, bank,
 ## 按需资源
 
 - 需要资源类型与消费 API 对照时读取 references/asset-pipelines.md。
+- 注册库存、Minimap、图鉴或技能树图标 Atlas 时读取 references/ui-atlas-registration.md。
 

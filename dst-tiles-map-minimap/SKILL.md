@@ -15,7 +15,7 @@ description: Create Don't Starve Together ground tiles, turf, map and minimap as
 4. 声明 ground、noise、minimap、inventory atlas 等资源，并核对纹理尺寸、格式和路径。
 5. 按需要设置 Tile、Minimap 和 Falloff 属性或渲染顺序；只调整自定义内容相关项。
 6. 世界生成 Room 与布局引用稳定 Tile 常量，不硬编码可能冲突的数字 ID。
-7. 实体地图图标使用 MiniMapEntity 和注册 Atlas，明确可见范围、图标和移除行为。
+7. 实体地图图标使用 MiniMapEntity 和在 modmain 中 AddMinimapAtlas 注册的 Atlas，SetIcon 名称与 XML 元素名一致，明确可见范围、图标和移除行为。
 8. 用新世界、存档重载、铺地/铲地、地图缩放和多个地皮模组组合测试。
 
 ## 地面纹理合成与变暗排查
