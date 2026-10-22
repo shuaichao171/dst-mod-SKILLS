@@ -1,4 +1,4 @@
-# 全局 PostInit 钩子与玩家初始化
+# 全局 PostInit 钩子、玩家初始化与函数包装
 
 以下结论来自 `modutil.lua`、`mods.lua`、`mainfunctions.lua`、`entityscript.lua` 和 `prefabs/player_common.lua`，游戏更新后先重新核对。
 
@@ -97,3 +97,54 @@ AddGlobalClassPostConstruct("entityscript", "EntityScript", function(self) ... e
 - 用于不通过 `return` 导出、而是直接写入全局变量的类文件（例如 `entityscript.lua` 定义的全局 `EntityScript`）。实现是先 `require(package)`，再 `rawget(_G, classname)`，取不到时回退到 `require` 的返回值。
 - 普通的 `widgets/*`、`screens/*`、`components/*` 文件会返回类表，用 `AddClassPostConstruct(path, fn)`。
 - 两者都只包装构造函数（`_ctor`），对已经创建的实例无效。需要修改方法时，改类表上的方法，并遵守"保存旧函数并原样转发参数"的规则。
+
+## 包装原函数：必须带 `...`
+
+hook 原版或其他模组的函数时，包装函数**必须用 `...` 接收并原样转发全部参数**，返回值也要原样返回。即使当前版本只有一两个参数，也不能只写自己知道的那几个。
+
+```lua
+-- 正确：已知参数可以单独命名，后面仍然要带 ...
+local old_DoDelta = self.DoDelta
+self.DoDelta = function(self, amount, ...)
+    if self.inst:HasTag("mymod_immune") and amount < 0 then
+        amount = 0
+    end
+    return old_DoDelta(self, amount, ...)
+end
+
+-- 错误：丢掉了 overtime、cause、ignore_invincible、afflicter、ignore_absorb 等后续参数，也丢掉了返回值
+self.DoDelta = function(self, amount)
+    old_DoDelta(self, amount)
+end
+```
+
+原因：
+
+- Klei 更新时经常在参数列表**末尾追加**新参数。只写固定参数的包装会把新参数吞掉，原函数拿到 `nil`，行为悄悄改变，不会报错。
+- 其他模组可能也包装了同一个函数，并传入额外参数。参数链只要有一层截断，后面所有层都会收不到。
+- 很多函数有多个返回值，或者调用方依赖返回值（例如 `Combat:GetAttacked` 返回是否受击，`Widget:OnControl` 返回"已处理"标志）。不写 `return` 会导致调用方逻辑出错。
+
+### 写法规则
+
+- 先保存旧函数：`local old_fn = obj.Fn`；不确定它是否存在时，判断 `nil`，或者回退到空函数。
+- 签名写成 `function(self, 需要用的参数, ...)`，调用写成 `old_fn(self, 需要用的参数, ...)`。修改参数时，只替换自己命名的那几个，`...` 原样传下去。
+- 只需要在原函数**之前**加逻辑时，用尾调用 `return old_fn(self, ...)`，所有返回值都会保留。
+- 需要在原函数**之后**处理返回值时，先把返回值完整收集起来，再原样返回。不要只取第一个值，也不要用 `{old_fn(...)}` 加 `unpack`，那样遇到中间的 nil 会截断：
+
+```lua
+-- select、unpack 没有注入模组入口环境；未设置 GLOBAL 继承时，从 GLOBAL 局部化
+local select, unpack = GLOBAL.select, GLOBAL.unpack
+local function pack(...) return { n = select("#", ...), ... } end
+
+local old_GetAttacked = self.GetAttacked
+self.GetAttacked = function(self, ...)
+    local ret = pack(old_GetAttacked(self, ...))
+    -- 在这里做后处理
+    return unpack(ret, 1, ret.n)
+end
+```
+
+- 同样的规则适用于各种回调字段的包装：`fn`、`onenter`/`onexit`、`testfn`、`ListenForEvent` 的回调、Widget 的 `OnControl`/`OnGainFocus`。例如 `state.onenter = function(inst, ...) old_onenter(inst, ...) end`（`GoToState(name, params)` 会把 params 传给 `onenter`）。
+- `AddClassPostConstruct` 的回调是 `fn(self, ...)`，构造参数会原样传进来。需要用构造参数时，按原类构造函数的签名命名，后面仍然要带 `...`。
+- 不要依赖 Lua 5.0 风格的隐式 `arg` 表（虽然 DST 的 Lua 5.1 仍兼容），统一用 `...`；`arg` 遇到 nil 会截断，也会额外分配一张表。
+

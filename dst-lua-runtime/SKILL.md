@@ -27,7 +27,7 @@ description: Work safely with the Don't Starve Together Lua runtime and mod envi
 
 - 不要假设所有入口拥有相同全局表或 TheWorld、ThePlayer。
 - 不要把模组入口环境中的 GLOBAL 写法复制到引擎通过 require 加载的模块。
-- 不要无条件覆盖原函数；包装时保留可变参数、多返回值和 self。
+- 不要无条件覆盖原函数；包装时保留 self，签名必须带 `...` 并原样转发，多个返回值也原样返回。写法见 dst-hooking-compatibility 的 references/post-init-hooks.md。
 - 不要依赖未验证的 upvalue 名称或索引。
 - 不要在模块加载阶段执行依赖已生成世界或玩家的逻辑。
 
