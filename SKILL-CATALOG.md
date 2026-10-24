@@ -1,8 +1,6 @@
 # DST Mod Skills Catalog
 
-本工作区包含 48 个可独立触发的 Codex Skill。默认源码基线为：
-
-    D:\steam\steamapps\common\Don't Starve Together\data\scripts
+本工作区包含 48 个可独立触发的 Codex Skill。源码基线为 `DST_DATA_DIR` 下的 `scripts/`；本机实际路径以工作流私有路径配置为准。
 
 所有 Skill 都把游戏源码视为只读参考；实际修改应落在用户指定的 Mod 目录。
 
@@ -69,7 +67,7 @@
 | Skill | 职责 |
 | --- | --- |
 | dst-performance-profiling | 性能测量与优化 |
-| dst-dedicated-server-testing | 专服与多分片测试 |
+| dst-dedicated-server-testing | 通用无头测试、专服与多分片验证；含隔离启动、用例驱动、判定、复测与清理 |
 | dst-workshop-release | 候选包和授权发布 |
 | dst-api-update-diff | 游戏更新后的源码快照和影响分析 |
 | dst-mod-review-refactoring | 证据驱动的审查与重构 |

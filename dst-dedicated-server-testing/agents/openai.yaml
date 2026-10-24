@@ -1,4 +1,4 @@
 interface:
-  display_name: 'DST Dedicated Server Testing'
-  short_description: 'Test DST mods on dedicated multi-shard servers'
+  display_name: 'DST Headless & Dedicated Server Testing'
+  short_description: 'Run native headless regressions and dedicated server tests'
   default_prompt: 'Use $dst-dedicated-server-testing to implement and verify this DST mod task.'

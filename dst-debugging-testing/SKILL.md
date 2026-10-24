@@ -15,7 +15,7 @@ description: Diagnose and test Don't Starve Together mods. Use when investigatin
 4. 用最小世界和最少模组复现；冲突问题用二分启用或交换加载顺序。
 5. 沿堆栈进入模组代码，再用当前 data/scripts 查原版调用契约；不要只在报错行加 nil 判断。
 6. 添加带模组前缀、实体 GUID、端类型和状态的临时日志；高频路径做限流。
-7. 修复后执行主机、远端客户端、专服、洞穴、保存重载和目标生命周期回归，并移除临时噪声日志。
+7. 修复后按受影响行为选择主机、远端客户端、专服、洞穴、保存重载和目标生命周期回归，并移除临时噪声日志。引擎运行逻辑适合自动验证时，使用无头测试流程；图形与网络行为追加对应客户端验证。
 
 ## 源码锚点
 
@@ -40,4 +40,5 @@ description: Diagnose and test Don't Starve Together mods. Use when investigatin
 ## 按需资源
 
 - 需要系统化覆盖时读取 references/test-matrix.md。
+- 需要原生无头复现或自动回归时，完整阅读 [../dst-dedicated-server-testing/SKILL.md](../dst-dedicated-server-testing/SKILL.md)，再使用其通用无头流程。
 
