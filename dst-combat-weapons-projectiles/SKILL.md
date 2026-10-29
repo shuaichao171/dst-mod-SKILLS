@@ -13,7 +13,7 @@ description: Implement Don't Starve Together combat, targeting, weapons, armor, 
 2. 配置 combat、health、weapon、armor、planardamage、planardefense、damagetypebonus 或 damagetyperesist。
 3. 让 Brain 选择目标，SG 在正确帧调用攻击，Component 负责数值；避免三处重复实现命中规则。
 4. 投射物明确发射者、目标或落点、速度、命中/错过/移除回调、平台坐标和重新瞄准规则。
-5. 范围伤害用带标签过滤的有限半径查询，排除攻击者、盟友、无效和不可交互实体。
+5. 范围伤害用带标签过滤的有限半径查询，排除攻击者、盟友、无效和不可交互实体；需要击退目标时向目标 PushEvent("knockback", { knocker, radius, strengthmult, forcelanded, disablecollision })，由目标 SG 的 CommonHandlers.OnKnockback 统一反应（2026-10 起约 50 个原版生物 SG 已支持，见 stategraph 技能）。
 6. 把声音、FX、震屏与服务器伤害分离，确保预测或 dirty 回调不重复造成伤害。
 7. 测试无甲/有甲、位面防御、骑乘、睡眠、冰冻、平台、目标死亡和多个攻击者。
 
@@ -21,7 +21,7 @@ description: Implement Don't Starve Together combat, targeting, weapons, armor, 
 
 - components/combat.lua、health.lua、weapon.lua、armor.lua。
 - components/planardamage.lua、planardefense.lua、damagetypebonus.lua、damagetyperesist.lua。
-- components/projectile.lua、complexprojectile.lua 及投射物 Prefab。
+- components/projectile.lua、complexprojectile.lua 及投射物 Prefab；prefabs/alterguardian_laser.lua、components/explosive.lua：击退事件发出范例。
 - brains/ 与 stategraphs/ 中同类攻击者范例。
 
 ## 不变量

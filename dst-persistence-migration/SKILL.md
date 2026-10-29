@@ -22,6 +22,7 @@ description: Implement durable Don't Starve Together save and load behavior. Use
 - entityscript.lua：GetSaveRecord、GetPersistData、SetPersistData、LoadPostPass 和 LongUpdate。
 - components/ 中的 OnSave、OnLoad、LoadPostPass、LongUpdate，以及 prefabs/ 中的 inst.OnSave、inst.OnLoad、inst.OnLoadPostPass、inst.OnLongUpdate 范例。
 - savefileupgrades.lua：内置存档格式升级实现，不是模组公开钩子；worldsettings_overrides.lua、map/retrofit_savedata.lua：世界设置与 Retrofit。
+- TheSim 持久化字符串 API（GetPersistentString/SetPersistentString/ErasePersistentString 及 `*InClusterSlot` 变体）：模组自身的配置/数据文件读写入口；引擎侧范例见 saveindex.lua、modindex.lua、cookbookdata.lua。
 
 ## 不变量
 
@@ -40,3 +41,4 @@ description: Implement durable Don't Starve Together save and load behavior. Use
 ## 按需资源
 
 - 需要数据边界、引用恢复和迁移顺序时读取 references/persistence-contract.md。
+- 模组要在专服上读写集群目录（cluster folder）内文件时：默认被引擎沙箱拦截；需服主在启动参数显式加 `-allow_persistentstorage_read_sandbox_escape` / `-allow_persistentstorage_write_sandbox_escape`（2026-10-27 热修 760178 新增）。模组不得假设该参数已开启，读写失败时静默降级；优先仍用组件/实体存档或模组自身 persistent string，集群目录文件只作为服主明确选装的高级能力。无头测试需覆盖两个启动参数开与关两种情况。

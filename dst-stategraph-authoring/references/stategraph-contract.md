@@ -86,6 +86,19 @@ end)
 - 合并只在 SG 模块第一次被 `require` 时发生一次（各实体共享同一个 StateGraph 对象）。注册必须写在 modmain 顶层；不要在 modmain 里提前 `require("stategraphs/SGwilson")`，否则在你之后注册的模组可能不会生效。
 - 预测动作要在 `wilson` 和 `wilson_client` 里各添加一份对应状态，并保持 tags 一致，否则客户端会进不去状态或被服务器纠正。
 
+## 可复用通用状态与事件（commonstates.lua）
+
+- `stategraphs/commonstates.lua` 提供两类复用入口：`CommonHandlers.*` 返回可直接放入 SG `events` 表的 EventHandler（OnAttacked、OnLocomote、OnFreeze、OnDeath 等）；`CommonStates.*` 向 states 表追加通用状态（AddWalkStates、AddRunStates、AddFrozenStates、AddSleepStates 等）。
+- 2026-10 万圣夜更新（760049/760178）新增小型生物击退标准实现，约 50 个原版生物 SG 已接入；Klei 预告后续会把它用于物品与角色能力，自建生物 SG 应接入：
+  - `CommonHandlers.OnKnockback()`：处理 `knockback` 事件。目标死亡、当前状态带 `nointerrupt` 或 `noknockback` tag、或 `inst.sg.mem.noknockback` 为真时忽略。
+  - `CommonStates.AddKnockbackStates(states, timelines, anims, fns, speedmult)`：追加 `knockback` 与 `knockbacklanded` 两个状态；`timelines`、`anims`、`fns` 各支持 `knockback`/`knockbacklanded` 两键，定制时间线、动画名（默认 `knockback`/`hit`）与 `knockback_onenter`/`knockback_onexit`/`knockback_onanimover` 等回调。
+  - 走 `knockbacklanded` 的条件：事件数据 `forcelanded`、目标 `swimming`、`heavybody` 标签，或装备带 `heavyarmor` 标签。
+  - 事件数据字段：`knocker`、`radius`、`strengthmult`、`forcelanded`、`disablecollision`；由攻击方 `PushEvent("knockback", data)` 发出（范例：components/explosive.lua、prefabs/alterguardian_laser.lua）。
+  - `components/combat.lua` 监听 `knockback` 事件并重置受击恢复延迟（CommonHandlers.ResetHitRecoveryDelay），与击中硬直共享冷却体系。
+- `sg:AddStateTag(tag)`（stategraph.lua）可在运行中给当前状态动态补 tag；`caninterrupt` 是官方约定的"可被打断"标记 tag（state tag，不是状态名），击退、electrocute 等反应会尊重它。
+- 接入方式：在 SG 的 events 表加 `CommonHandlers.OnKnockback()`，在 states 构建处调用 `CommonStates.AddKnockbackStates(states, ...)`（范例：stategraphs/SGbat.lua）；个别状态想豁免就给该状态加 `noknockback` tag。
+
+
 ## 对称清理
 
 进入时改变以下内容，退出时必须恢复：

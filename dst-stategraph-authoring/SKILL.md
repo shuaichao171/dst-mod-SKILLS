@@ -21,7 +21,7 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 ## 源码锚点
 
 - stategraph.lua：StateGraphInstance、GoToState、timeout、state tag 与事件处理。
-- stategraphs/commonstates.lua：可复用状态构造。
+- stategraphs/commonstates.lua：可复用通用状态与事件（CommonHandlers/CommonStates）；2026-10 新增生物击退标准实现（OnKnockback + AddKnockbackStates）。
 - stategraphs/SGwilson.lua 和客户端玩家 SG：预测动作。
 - stategraphs/ 中同类生物或物件 SG。
 
@@ -41,4 +41,4 @@ description: Create and extend Don't Starve Together stategraphs. Use when writi
 ## 按需资源
 
 - 复制 assets/stategraph-template.lua 创建独立 SG。
-- 需要状态契约、玩家预测、玩家碰撞处理或向已有 SG 注入状态/事件时读取 references/stategraph-contract.md。
+- 需要状态契约、玩家预测、玩家碰撞处理、通用状态/事件复用（含击退）或向已有 SG 注入状态/事件时读取 references/stategraph-contract.md。
