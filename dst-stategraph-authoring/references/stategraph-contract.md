@@ -93,10 +93,11 @@ end)
   - `CommonHandlers.OnKnockback()`：处理 `knockback` 事件。目标死亡、当前状态带 `nointerrupt` 或 `noknockback` tag、或 `inst.sg.mem.noknockback` 为真时忽略。
   - `CommonStates.AddKnockbackStates(states, timelines, anims, fns, speedmult)`：追加 `knockback` 与 `knockbacklanded` 两个状态；`timelines`、`anims`、`fns` 各支持 `knockback`/`knockbacklanded` 两键，定制时间线、动画名（默认 `knockback`/`hit`）与 `knockback_onenter`/`knockback_onexit`/`knockback_onanimover` 等回调。
   - 走 `knockbacklanded` 的条件：事件数据 `forcelanded`、目标 `swimming`、`heavybody` 标签，或装备带 `heavyarmor` 标签。
-  - 事件数据字段：`knocker`、`radius`、`strengthmult`、`forcelanded`、`disablecollision`；由攻击方 `PushEvent("knockback", data)` 发出（范例：components/explosive.lua、prefabs/alterguardian_laser.lua）。
+  - 事件数据字段：`knocker`、`radius`、`strengthmult`、`forcelanded`；由攻击方 `PushEvent("knockback", data)` 发出（范例：components/explosive.lua、prefabs/alterguardian_laser.lua）。`disablecollision` 字段只有玩家侧击退状态消费（SGwilson），通用生物击退不使用它。
   - `components/combat.lua` 监听 `knockback` 事件并重置受击恢复延迟（CommonHandlers.ResetHitRecoveryDelay），与击中硬直共享冷却体系。
-- `sg:AddStateTag(tag)`（stategraph.lua）可在运行中给当前状态动态补 tag；`caninterrupt` 是官方约定的"可被打断"标记 tag（state tag，不是状态名），击退、electrocute 等反应会尊重它。
+- `sg:AddStateTag(tag)` / `sg:RemoveStateTag(tag)`（stategraph.lua）可在运行中动态增删当前状态的 tag；`caninterrupt` 是官方约定的“busy 中仍可被打断”标记 tag（OnAttacked 检查 `HasAnyStateTag("caninterrupt", "frozen")`）。时间线辅助 `FrameEvent(frame, fn)`、`SoundFrameEvent(frame, sound)` 等价于 `TimeEvent(frame * FRAMES, fn)`，击退时间线即用它们构建。
 - 接入方式：在 SG 的 events 表加 `CommonHandlers.OnKnockback()`，在 states 构建处调用 `CommonStates.AddKnockbackStates(states, ...)`（范例：stategraphs/SGbat.lua）；个别状态想豁免就给该状态加 `noknockback` tag。
+- 本节面向生物 SG；玩家击退是 SGwilson 自己的一套 `knockback` EventHandler 与状态（`knockback_high`/`knockback_low`/`knockbacklanded`/`parry_knockback`），修改玩家击退行为时在 SGwilson 与 `wilson_client` 对应状态处理，不要给玩家 SG 挂 CommonHandlers.OnKnockback。
 
 
 ## 对称清理
