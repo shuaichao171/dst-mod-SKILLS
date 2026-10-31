@@ -9,13 +9,19 @@ description: Research and trace Don't Starve Together Lua source. Use when locat
 
 ## 工作流
 
-1. 确认源码根目录。默认使用 D:\steam\steamapps\common\Don't Starve Together\data\scripts；先验证 main.lua、modutil.lua 与目标子目录存在。
+1. 确认源码根目录。默认使用 `DST_DATA_DIR\scripts`（实际路径见工作流 `private/paths.md`；脚本可用 `-Root` 或环境变量 `DST_DATA_DIR` 指定）；先验证 main.lua、modutil.lua 与目标子目录存在。没有解包目录、或要确认与当前安装 build 完全一致时，用 `scripts/dst_scripts_zip.py` 直接读安装目录里的 `scripts.zip`（见下方「脚本」）。
 2. 把问题归入 Prefab、Component、Brain、Behaviour、StateGraph、Action、Network、UI、Worldgen 或引擎原生绑定，再缩小搜索范围。
 3. 先用 rg --files 找候选文件，再用 rg -n 搜符号定义、require、构造调用、标签、事件和组件名；避免直接倾倒整个大文件。
 4. 从入口沿 require、Class、Prefab、AddComponent、ListenForEvent、SetBrain、SetStateGraph 和 ActionHandler 追踪到实际执行点。
 5. 至少比较一个最接近的原版实现；高风险机制比较两个以上，并说明选择该范例的理由。
 6. 找不到 Lua 定义时，将方法视为引擎绑定；搜索所有调用点、参数形态和前后生命周期，不虚构 C++ 契约。
 7. 输出精确文件与行号、已验证事实、基于调用点的推断，以及仍未解决的问题。
+
+## 脚本
+
+- `scripts/dst_scripts_zip.py`：直接读取 `<DST_GAME_HOME>\data\databundles\scripts.zip`，不解包、不写游戏目录。`info` 给出 build、SHA-256 和条目数（写进研究记录便于更新后复查）；`list --glob`、`grep <正则> --glob`、`show <文件> --lines a:b`、`extract <文件> --to <路径>`（目标已存在时拒绝覆盖）。成员名写 `components/health.lua` 即可。
+- `scripts/scan-dst-source.ps1`：扫描已解包的 scripts 目录（模块摘要、文件列表、符号搜索）。
+- 离线测试：`python -m unittest discover -s dst-source-research/tests`。
 
 ## 源码锚点
 

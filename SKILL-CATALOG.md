@@ -8,7 +8,7 @@
 
 | Skill | 职责 |
 | --- | --- |
-| dst-source-research | 搜索源码、追踪调用链和原版范例 |
+| dst-source-research | 搜索源码、追踪调用链和原版范例；`dst_scripts_zip.py` 直读 scripts.zip |
 | dst-mod-scaffolding | modinfo 与各入口脚手架 |
 | dst-lua-runtime | Class、GLOBAL、模块和调度环境 |
 | dst-hooking-compatibility | PostInit、包装和模组兼容 |
@@ -20,7 +20,7 @@
 | dst-action-authoring | Action、ComponentAction、BufferedAction |
 | dst-stategraph-authoring | SG 状态、时间线和预测 |
 | dst-brain-authoring | Brain 与 Behaviour Tree |
-| dst-debugging-testing | 日志、最小复现和测试矩阵 |
+| dst-debugging-testing | 日志、最小复现、测试矩阵；`dst_lua_check.py` 语法与组件方法静态检查 |
 
 ## 常用玩法
 
@@ -67,7 +67,7 @@
 | Skill | 职责 |
 | --- | --- |
 | dst-performance-profiling | 性能测量与优化 |
-| dst-dedicated-server-testing | 通用无头测试、专服与多分片验证；含隔离启动、用例驱动、判定、复测与清理 |
+| dst-dedicated-server-testing | 通用无头测试、专服与多分片验证；`dst_headless_run.py` 一条命令完成隔离启动、行为脚本、判定与清理 |
 | dst-workshop-release | 候选包和授权发布 |
 | dst-api-update-diff | 游戏更新后的源码快照和影响分析 |
 | dst-mod-review-refactoring | 证据驱动的审查与重构 |

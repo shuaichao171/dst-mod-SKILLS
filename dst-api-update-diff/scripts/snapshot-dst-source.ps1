@@ -1,8 +1,10 @@
 [CmdletBinding()]
 param(
-    [string]$Root = 'D:\steam\steamapps\common\Don''t Starve Together\data\scripts',
+    [string]$Root = $(if ($env:DST_DATA_DIR) { Join-Path $env:DST_DATA_DIR 'scripts' } else { '' }),
     [string]$OutputPath = '.\dst-source-snapshot.json'
 )
+
+if (-not $Root) { throw 'Pass -Root <DST data\scripts> or set the DST_DATA_DIR environment variable.' }
 
 function Get-CaptureValues {
     param(

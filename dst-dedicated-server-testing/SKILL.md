@@ -18,6 +18,21 @@ description: Run isolated native headless tests for Don't Starve Together mods a
 
 只启动覆盖当前改动所需的端与场景；单分片无头用例不要求额外启动 Caves 或图形客户端。
 
+## 无头测试脚本
+
+单分片离线回归直接用 `scripts/dst_headless_run.py`，不要每次重写控制器：
+
+```text
+python scripts/dst_headless_run.py --mod <依赖模组> --mod <被测模组> --behavior <用例.lua> --out <目标项目>/_ai_work/headless
+```
+
+- 每次生成唯一 run_id；被测模组以 SHA-256 清单校验后复制到 `mods/_altwf_<run_id>_<n>`，另生成测试驱动模组；独立集群、独立 ugc 目录、仅局域网合法端口（10998–11018）。
+- 行为脚本用全局 `TEST`：`Check / Equal / Near / Metric / Log / Spawn / After / Invalid / Done`，全部断言之后必须 `TEST.Done()`。
+- 判定：passed / failed（断言失败、脚本报错或就绪后日志出现 LUA ERROR）/ invalid（被测模组没加载、标记无效或零断言）/ interrupted（超时或进程提前退出）。结果在 `<out>/<run_id>/results/result.json` 与 `events.jsonl`，原始日志在 `logs/`。
+- 结束时发 `c_shutdown(false)`，超时才终止本次启动的进程；默认删除本次复制到 `mods/` 的快照（`--keep-staged` 保留）。`--list-stale` / `--remove-stale` 只处理本工具前缀 `_altwf_` 的遗留目录。
+- 用 `--mod-config` 传配置项，`--allow-sandbox-escape` 仅在模组确需读写集群目录外文件时使用。洞穴、多分片和真实客户端仍按下方工作流手工编排。
+- 离线测试（假专服）：`python -m unittest discover -s dst-dedicated-server-testing/tests`；真机冒烟样例：`tests/fixtures/sample_mod` + `tests/fixtures/smoke_behavior.lua`（build 761239 实测约 80 秒通过）。
+
 ## 工作流
 
 1. 确认游戏版本、模组与依赖、运行端、预期结果和测试范围；本机路径从工作流私有配置读取。

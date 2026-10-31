@@ -48,10 +48,10 @@ description: Create, compile, debug, and integrate shader resources for Don't St
 
 ## 编译与部署
 
-默认 Mod Tools 路径为：
+Mod Tools 位于 `DST_GAME_HOME\mod_tools`（实际路径见工作流 `private/paths.md`），先把它设到环境变量再调用：
 
 ```powershell
-& "D:\steam\steamapps\common\Don't Starve Together\mod_tools\tools\bin\ShaderCompiler.exe" `
+& "$env:DST_GAME_HOME\mod_tools\tools\bin\ShaderCompiler.exe" `
   -little <name> <vertex.vs> <fragment.ps> <name.ksh> -oglsl
 ```
 

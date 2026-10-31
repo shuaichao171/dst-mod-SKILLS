@@ -1,11 +1,13 @@
 [CmdletBinding()]
 param(
-    [string]$Root = 'D:\steam\steamapps\common\Don''t Starve Together\data\scripts',
+    [string]$Root = $(if ($env:DST_DATA_DIR) { Join-Path $env:DST_DATA_DIR 'scripts' } else { '' }),
     [ValidateSet('Summary', 'Files', 'Symbol')]
     [string]$Mode = 'Summary',
     [string]$Pattern,
     [string]$Glob = '*.lua'
 )
+
+if (-not $Root) { throw 'Pass -Root <DST data\scripts> or set the DST_DATA_DIR environment variable.' }
 
 $resolvedRoot = (Resolve-Path -LiteralPath $Root -ErrorAction Stop).Path
 if (-not (Test-Path -LiteralPath (Join-Path $resolvedRoot 'main.lua') -PathType Leaf)) {

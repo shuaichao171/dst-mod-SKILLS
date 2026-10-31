@@ -16,8 +16,10 @@
 默认源码基线：
 
 ```text
-D:\steam\steamapps\common\Don't Starve Together\data\scripts
+<DST_DATA_DIR>\scripts
 ```
+
+`DST_DATA_DIR` 的实际路径记录在工作流的 `private/paths.md`（不公开）。
 
 ## 接入方式：通过约定间接装载
 

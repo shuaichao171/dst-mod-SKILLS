@@ -1,6 +1,6 @@
 # Widget 契约与原版模式
 
-来源基线：`D:\steam\steamapps\common\Don't Starve Together\data\scripts`，于 2026-08-06 查阅。下面的文件与行号描述当前安装版本；游戏更新后重新核对。
+来源基线：`DST_DATA_DIR\scripts`，于 2026-08-06 查阅。下面的文件与行号描述当前安装版本；游戏更新后重新核对。
 
 ## 树与生命周期
 
